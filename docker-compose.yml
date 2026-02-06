@@ -1,0 +1,82 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: scam-intel-db
+    environment:
+      POSTGRES_DB: scam_intelligence
+      POSTGRES_USER: scam_user
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-changeme123}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./scripts/init-db.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U scam_user -d scam_intelligence"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - scam-intel-network
+
+  # Redis for caching (optional)
+  redis:
+    image: redis:7-alpine
+    container_name: scam-intel-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+    networks:
+      - scam-intel-network
+
+  # Scam Intelligence API
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: scam-intel-api
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      LOG_LEVEL: info
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: scam_intelligence
+      DB_USER: scam_user
+      DB_PASSWORD: ${DB_PASSWORD:-changeme123}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      CORS_ORIGIN: ${CORS_ORIGIN:-*}
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    networks:
+      - scam-intel-network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  scam-intel-network:
+    driver: bridge
