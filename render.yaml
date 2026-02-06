@@ -1,0 +1,44 @@
+services:
+  # Web Service (API)
+  - type: web
+    name: scam-intel-api
+    env: node
+    region: oregon
+    plan: starter
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: LOG_LEVEL
+        value: info
+      - key: DATABASE_URL
+        fromDatabase:
+          name: scam-intel-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: scam-intel-redis
+          property: connectionString
+    healthCheckPath: /health
+    autoDeploy: true
+
+  # PostgreSQL Database
+  - type: pgsql
+    name: scam-intel-db
+    region: oregon
+    plan: starter
+    databaseName: scam_intelligence
+    databaseUser: scam_intel_user
+    ipAllowList: []
+
+  # Redis Cache
+  - type: redis
+    name: scam-intel-redis
+    region: oregon
+    plan: starter
+    maxmemoryPolicy: allkeys-lru
+    ipAllowList: []
