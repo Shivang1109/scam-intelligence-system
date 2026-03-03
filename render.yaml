@@ -1,17 +1,17 @@
 services:
-  # Web Service (API)
+  # Web Service (API + Frontend)
   - type: web
     name: scam-intel-api
     env: node
     region: oregon
     plan: starter
     buildCommand: npm ci && npm run build
-    startCommand: npm start
+    startCommand: node simple-server.js
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
-        value: 3000
+        value: 10000
       - key: LOG_LEVEL
         value: info
     healthCheckPath: /health
