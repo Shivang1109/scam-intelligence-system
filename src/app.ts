@@ -3,6 +3,7 @@
  * Wires all components together and starts the server
  */
 
+import 'dotenv/config';
 import { APIServer } from './api/server';
 import { AgentController } from './agents/AgentController';
 import { StateMachine } from './agents/StateMachine';

@@ -28,13 +28,25 @@ Complete guide to enable AI-powered scam detection using OpenAI.
 
 ### Step 2: Add API Key
 
+**⚠️ SECURITY WARNING:**
+- NEVER commit API keys to git
+- NEVER share API keys in chat/email
+- NEVER hardcode keys in source code
+- If a key is exposed, revoke it immediately at https://platform.openai.com/api-keys
+
 **Local Development:**
 ```bash
-# Create .env file
+# Create .env file (already in .gitignore)
 cp .env.example .env
 
 # Edit .env and add your key
 OPENAI_API_KEY=sk-your-actual-key-here
+```
+
+**Verify .env is ignored:**
+```bash
+# This should show .env in .gitignore
+cat .gitignore | grep .env
 ```
 
 **Render Deployment:**

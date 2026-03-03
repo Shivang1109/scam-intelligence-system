@@ -8,7 +8,7 @@ import { NLPExtractor } from '../nlp/NLPExtractor';
 import { ScamSignalDetector } from '../nlp/ScamSignalDetector';
 import { ScamClassifier } from '../scoring/ScamClassifier';
 import { RiskScorer } from '../scoring/RiskScorer';
-import { Entity, ScamSignal, ScamClassification } from '../types';
+import { Entity, ScamSignal, ScamClassification, ConversationState } from '../types';
 
 export interface HybridAnalysisResult {
   entities: Entity[];
@@ -68,14 +68,54 @@ export class HybridAnalyzer {
   private runRuleBasedAnalysis(message: string): Omit<HybridAnalysisResult, 'aiEnhanced'> {
     const entities = this.nlpExtractor.extractEntities(message);
     const signals = this.signalDetector.detectSignals(message);
-    const classification = this.classifier.classify(message, signals, entities);
-    const riskScore = this.riskScorer.calculateRiskScore(signals, entities, classification);
+    
+    // Create a minimal conversation object for classification
+    const tempConversation = {
+      id: 'temp',
+      state: ConversationState.IDLE,
+      persona: {
+        id: 'temp-persona',
+        name: 'Temp',
+        age: 0,
+        background: '',
+        vulnerabilityLevel: 5,
+        communicationStyle: '',
+        typicalResponses: [],
+        characteristics: {
+          techSavvy: 5,
+          trustLevel: 5,
+          financialAwareness: 5,
+          responseSpeed: 5
+        }
+      },
+      messages: [{
+        id: 'temp-msg',
+        content: message,
+        sender: 'scammer' as const,
+        timestamp: new Date()
+      }],
+      extractedEntities: entities,
+      scamSignals: signals,
+      classification: null,
+      riskScore: 0,
+      metadata: {
+        initialMessage: message,
+        messageCount: 1,
+        duration: 0,
+        stateHistory: []
+      },
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+
+    const classification = this.classifier.classify(tempConversation);
+    const riskScoreResult = this.riskScorer.calculateScore(tempConversation);
 
     return {
       entities,
       signals,
       classification,
-      riskScore,
+      riskScore: riskScoreResult.score,
     };
   }
 
@@ -172,7 +212,6 @@ export class HybridAnalyzer {
     ruleBasedSignals: ScamSignal[],
     aiSignals: Array<{ type: any; confidence: number; evidence: string }>
   ): ScamSignal[] {
-    const merged: ScamSignal[] = [];
     const signalMap = new Map<string, ScamSignal>();
 
     // Add rule-based signals

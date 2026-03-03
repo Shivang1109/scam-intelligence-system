@@ -6,6 +6,7 @@
 import express, { Application } from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
+import path from 'path';
 import { errorHandler, requestLogger } from './middleware';
 import { AgentController } from '../agents/AgentController';
 import { createConversationRoutes } from './routes/conversations';
@@ -29,6 +30,7 @@ export class APIServer {
     this.reportRepository = reportRepository;
     this.setupMiddleware();
     this.setupRoutes();
+    this.setupStaticFiles();  // Add static files AFTER routes but BEFORE error handling
     this.setupErrorHandling();
   }
 
@@ -101,19 +103,18 @@ export class APIServer {
   }
 
   /**
+   * Set up static file serving
+   */
+  private setupStaticFiles(): void {
+    // Serve static files from public directory
+    this.app.use(express.static(path.join(process.cwd(), 'public')));
+  }
+
+  /**
    * Set up error handling middleware
    */
   private setupErrorHandling(): void {
-    // 404 handler
-    this.app.use((req, res) => {
-      res.status(404).json({
-        error: 'Not Found',
-        message: `Route ${req.method} ${req.path} not found`,
-        timestamp: new Date().toISOString(),
-      });
-    });
-
-    // Global error handler
+    // Global error handler (must be last)
     this.app.use(errorHandler);
   }
 

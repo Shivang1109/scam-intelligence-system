@@ -43,11 +43,11 @@ This implementation plan breaks down the Agentic Scam Intelligence System into d
     - Add natural variation to timing
     - _Requirements: 1.4_
   
-  - [~] 3.3 Write property test for persona selection appropriateness
+  - [ ] 3.3 Write property test for persona selection appropriateness
     - **Property 1: Persona Selection Appropriateness**
     - **Validates: Requirements 1.1**
   
-  - [~] 3.4 Write property test for persona response consistency
+  - [ ] 3.4 Write property test for persona response consistency
     - **Property 2: Persona Response Consistency**
     - **Validates: Requirements 1.2, 1.3**
   
