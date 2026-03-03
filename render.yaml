@@ -14,31 +14,13 @@ services:
         value: 3000
       - key: LOG_LEVEL
         value: info
-      - key: DATABASE_URL
-        fromDatabase:
-          name: scam-intel-db
-          property: connectionString
-      - key: REDIS_URL
-        fromService:
-          type: redis
-          name: scam-intel-redis
-          property: connectionString
     healthCheckPath: /health
     autoDeploy: true
 
+databases:
   # PostgreSQL Database
-  - type: pgsql
-    name: scam-intel-db
-    region: oregon
-    plan: starter
+  - name: scam-intel-db
     databaseName: scam_intelligence
-    databaseUser: scam_intel_user
-    ipAllowList: []
-
-  # Redis Cache
-  - type: redis
-    name: scam-intel-redis
-    region: oregon
+    user: scam_intel_user
     plan: starter
-    maxmemoryPolicy: allkeys-lru
-    ipAllowList: []
+    region: oregon
