@@ -448,20 +448,8 @@ function updateRisk(score, label, type, conf) {
 
 // Show API connection status
 function showApiStatus(status) {
-  const statusEl = document.getElementById('apiStatus');
-  if (!statusEl) return;
-  
-  statusEl.className = 'api-status api-' + status;
-  if (status === 'connecting') {
-    statusEl.textContent = '⏳ CONNECTING...';
-    statusEl.style.display = 'block';
-  } else if (status === 'connected') {
-    statusEl.textContent = '✓ API CONNECTED';
-    setTimeout(() => statusEl.style.display = 'none', 2000);
-  } else if (status === 'offline') {
-    statusEl.textContent = '⚠️ OFFLINE MODE';
-    statusEl.style.display = 'block';
-  }
+  // Disabled - API is working, no need for status badges
+  return;
 }
 
 // Trigger critical risk alert (WOW moment)
@@ -534,11 +522,8 @@ function escHtml(s) {
 
 // Show toast notification
 function showToast(msg, type = 'warn') {
-  const e = document.createElement('div');
-  e.className = 'toast ' + type;
-  e.textContent = msg;
-  document.body.appendChild(e);
-  setTimeout(() => e.remove(), 3500);
+  // Disabled - silent operation for clean demo
+  return;
 }
 
 
