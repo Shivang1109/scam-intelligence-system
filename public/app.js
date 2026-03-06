@@ -218,6 +218,12 @@ function updateFromConversation(conv) {
 
 // Simulate local analysis (fallback when backend unavailable)
 function simulateLocalAnalysis(msg) {
+  // Generate a local session ID if we don't have one
+  if (!conversationId) {
+    conversationId = 'local-' + Math.random().toString(36).substring(2, 10);
+    document.getElementById('sbConvId').textContent = 'SESSION: ' + conversationId.substring(0, 8).toUpperCase();
+  }
+  
   const low = msg.toLowerCase();
   let risk = 0;
   const sigs = [];

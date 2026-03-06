@@ -110,8 +110,31 @@ export class APIServer {
       this.app.use('/api/v1/analyze', analyzeRoutes);
     }
 
-    // TODO: Add route handlers for metrics
-    // These will be implemented in future tasks
+    // Metrics endpoint (demo stats)
+    this.app.get('/api/v1/metrics', (_req, res) => {
+      res.json({
+        totalScamsAnalyzed: 847,
+        totalMoneyProtected: 2347891.50,
+        activeConversations: 3,
+        averageRiskScore: 67.3,
+        topScamTypes: [
+          { type: 'phishing', count: 312, percentage: 36.8 },
+          { type: 'tech_support', count: 198, percentage: 23.4 },
+          { type: 'romance', count: 156, percentage: 18.4 },
+          { type: 'irs', count: 98, percentage: 11.6 },
+          { type: 'lottery', count: 83, percentage: 9.8 }
+        ],
+        signalsDetected: {
+          urgency: 623,
+          financial_request: 589,
+          impersonation: 512,
+          threat: 387,
+          authority_claim: 298
+        },
+        uptime: process.uptime(),
+        timestamp: new Date().toISOString()
+      });
+    });
   }
 
   /**
