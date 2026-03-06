@@ -838,3 +838,230 @@ header {
 ::-webkit-scrollbar-thumb { 
   background: rgba(255,255,255,0.08); 
 }
+
+/* AI Analysis Panel */
+.ai-panel {
+  border-top: 1px solid var(--border);
+  padding: 16px 20px;
+  background: rgba(0, 219, 180, 0.03);
+  min-height: 80px;
+  max-height: 140px;
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+
+.ai-panel::-webkit-scrollbar {
+  width: 3px;
+}
+
+.ai-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-family: 'Syne Mono', monospace;
+  font-size: 10px;
+  letter-spacing: 0.5px;
+  background: linear-gradient(135deg, rgba(0, 219, 180, 0.15), rgba(123, 47, 247, 0.15));
+  color: var(--accent);
+  border: 1px solid rgba(0, 219, 180, 0.3);
+  animation: aiGlow 2s ease-in-out infinite;
+}
+
+@keyframes aiGlow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(0, 219, 180, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(0, 219, 180, 0.6);
+  }
+}
+
+.ai-badge i {
+  font-size: 11px;
+}
+
+/* Persona Panel */
+.persona-panel {
+  border-top: 1px solid var(--border);
+  padding: 16px 20px;
+  background: var(--surface2);
+  min-height: 100px;
+  max-height: 160px;
+  overflow-y: auto;
+  flex-shrink: 0;
+}
+
+.persona-panel::-webkit-scrollbar {
+  width: 3px;
+}
+
+.persona-card {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+  padding: 12px;
+  animation: fadeIn 0.4s ease;
+}
+
+.persona-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.persona-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.persona-name {
+  font-family: 'Syne', sans-serif;
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.persona-age {
+  font-family: 'Syne Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+.persona-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.persona-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.persona-stat-label {
+  font-family: 'Syne Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 0.5px;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.persona-stat-value {
+  font-family: 'Syne', sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--accent);
+}
+
+.persona-stat-bar {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-top: 2px;
+}
+
+.persona-stat-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+  transition: width 0.5s ease;
+}
+
+.persona-description {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.5;
+  margin-top: 8px;
+  font-style: italic;
+}
+
+/* Enhanced Signal Types */
+.signal-AUTHORITY_CLAIM {
+  background: rgba(96, 165, 250, 0.07);
+  border-color: rgba(96, 165, 250, 0.2);
+}
+
+.signal-AUTHORITY_CLAIM .signal-dot {
+  background: #60a5fa;
+}
+
+.signal-AUTHORITY_CLAIM .signal-name {
+  color: #93c5fd;
+}
+
+.signal-SOCIAL_ENGINEERING {
+  background: rgba(168, 85, 247, 0.07);
+  border-color: rgba(168, 85, 247, 0.2);
+}
+
+.signal-SOCIAL_ENGINEERING .signal-dot {
+  background: #a855f7;
+}
+
+.signal-SOCIAL_ENGINEERING .signal-name {
+  color: #c084fc;
+}
+
+.signal-TIME_PRESSURE {
+  background: rgba(251, 146, 60, 0.07);
+  border-color: rgba(251, 146, 60, 0.2);
+}
+
+.signal-TIME_PRESSURE .signal-dot {
+  background: #fb923c;
+}
+
+.signal-TIME_PRESSURE .signal-name {
+  color: #fdba74;
+}
+
+.signal-TOO_GOOD_TO_BE_TRUE {
+  background: rgba(236, 72, 153, 0.07);
+  border-color: rgba(236, 72, 153, 0.2);
+}
+
+.signal-TOO_GOOD_TO_BE_TRUE .signal-dot {
+  background: #ec4899;
+}
+
+.signal-TOO_GOOD_TO_BE_TRUE .signal-name {
+  color: #f9a8d4;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1400px) {
+  .layout {
+    grid-template-columns: 1fr 340px;
+  }
+  
+  .ai-panel,
+  .persona-panel {
+    max-height: 120px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+  
+  .right-col {
+    border-top: 1px solid var(--border);
+    border-left: none;
+  }
+}

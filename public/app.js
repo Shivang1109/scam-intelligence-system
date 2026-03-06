@@ -56,6 +56,7 @@ function newConversation() {
   
   updateRisk(0, 'LOW RISK', 'No threat detected', 'Awaiting data...');
   updateState('IDLE');
+  resetAIDisplays();
   updateStatusBar();
   document.getElementById('sbConvId').textContent = 'SESSION: —';
 }
@@ -185,6 +186,16 @@ function updateFromConversation(conv) {
     });
   }
   
+  // Update persona
+  if (conv.persona) {
+    updatePersona(conv.persona);
+  }
+  
+  // Update AI reasoning (if available)
+  if (conv.aiReasoning) {
+    updateAIReasoning(conv.aiReasoning, true);
+  }
+  
   updateStatusBar();
 }
 
@@ -217,6 +228,30 @@ function simulateLocalAnalysis(msg) {
   if (/arrest|jail|sue|lawsuit|criminal|warrant|suspend|lose.?your|seized/.test(low)) {
     risk += 20;
     sigs.push({ type: 'THREAT', confidence: 0.90, text: 'Threat language detected' });
+  }
+  
+  // Detect authority claims
+  if (/official|authorized|department|agency|representative|agent/.test(low)) {
+    risk += 15;
+    sigs.push({ type: 'AUTHORITY_CLAIM', confidence: 0.82, text: 'Authority claim detected' });
+  }
+  
+  // Detect social engineering
+  if (/trust|verify|confirm|validate|secure|protect|help.?you/.test(low)) {
+    risk += 12;
+    sigs.push({ type: 'SOCIAL_ENGINEERING', confidence: 0.78, text: 'Social engineering tactics detected' });
+  }
+  
+  // Detect time pressure
+  if (/within|hours|minutes|today|immediately|expire|deadline/.test(low)) {
+    risk += 18;
+    sigs.push({ type: 'TIME_PRESSURE', confidence: 0.85, text: 'Time pressure tactics detected' });
+  }
+  
+  // Detect too good to be true
+  if (/win|won|prize|lottery|million|guaranteed|free.?money|jackpot/.test(low)) {
+    risk += 22;
+    sigs.push({ type: 'TOO_GOOD_TO_BE_TRUE', confidence: 0.88, text: 'Unrealistic promises detected' });
   }
   
   // Extract entities
@@ -263,6 +298,24 @@ function simulateLocalAnalysis(msg) {
       }
     });
   }
+  
+  // Simulate AI reasoning
+  const reasoning = generateLocalReasoning(sigs, risk);
+  updateAIReasoning(reasoning, false);
+  
+  // Simulate persona (use a default one for local mode)
+  const defaultPersona = {
+    name: 'Margaret Thompson',
+    age: 68,
+    vulnerabilityLevel: 8,
+    characteristics: {
+      techSavvy: 3,
+      trustLevel: 9,
+      financialAwareness: 4
+    },
+    background: 'Retired teacher, trusting, not tech-savvy'
+  };
+  updatePersona(defaultPersona);
   
   const replies = [
     "Oh goodness, that sounds very serious. What exactly do I need to do?",
@@ -423,4 +476,100 @@ function showToast(msg, type = 'warn') {
   e.textContent = msg;
   document.body.appendChild(e);
   setTimeout(() => e.remove(), 3500);
+}
+
+
+// Update persona display
+function updatePersona(persona) {
+  const el = document.getElementById('personaInfo');
+  
+  if (!persona) {
+    el.innerHTML = '<span style="font-family:\'Syne Mono\',monospace;font-size:11px;color:var(--muted)">No persona assigned yet</span>';
+    return;
+  }
+  
+  const vulnLevel = persona.vulnerabilityLevel || 5;
+  const techSavvy = persona.characteristics?.techSavvy || 5;
+  const trustLevel = persona.characteristics?.trustLevel || 5;
+  
+  el.innerHTML = `
+    <div class="persona-card">
+      <div class="persona-header">
+        <div class="persona-avatar">👤</div>
+        <div>
+          <div class="persona-name">${persona.name || 'Unknown'}</div>
+          <div class="persona-age">Age ${persona.age || 'N/A'}</div>
+        </div>
+      </div>
+      <div class="persona-stats">
+        <div class="persona-stat">
+          <div class="persona-stat-label">Vulnerability</div>
+          <div class="persona-stat-value">${vulnLevel}/10</div>
+          <div class="persona-stat-bar">
+            <div class="persona-stat-fill" style="width: ${vulnLevel * 10}%"></div>
+          </div>
+        </div>
+        <div class="persona-stat">
+          <div class="persona-stat-label">Tech Savvy</div>
+          <div class="persona-stat-value">${techSavvy}/10</div>
+          <div class="persona-stat-bar">
+            <div class="persona-stat-fill" style="width: ${techSavvy * 10}%"></div>
+          </div>
+        </div>
+      </div>
+      ${persona.background ? `<div class="persona-description">"${persona.background}"</div>` : ''}
+    </div>
+  `;
+}
+
+// Update AI reasoning display
+function updateAIReasoning(reasoning, isAIEnhanced) {
+  const el = document.getElementById('aiReasoning');
+  const badge = document.getElementById('aiBadge');
+  
+  if (isAIEnhanced) {
+    badge.style.display = 'inline-flex';
+  } else {
+    badge.style.display = 'none';
+  }
+  
+  if (!reasoning) {
+    el.textContent = 'Awaiting analysis...';
+    el.style.color = 'var(--muted)';
+    return;
+  }
+  
+  el.textContent = reasoning;
+  el.style.color = isAIEnhanced ? 'var(--accent)' : 'var(--muted)';
+}
+
+// Generate local reasoning (for fallback mode)
+function generateLocalReasoning(signals, riskScore) {
+  if (signals.length === 0) {
+    return 'No significant threat indicators detected. Message appears benign.';
+  }
+  
+  const signalTypes = signals.map(s => s.type.toLowerCase().replace('_', ' ')).join(', ');
+  
+  let reasoning = `Pattern analysis detected ${signals.length} threat signal(s): ${signalTypes}. `;
+  
+  if (riskScore > 75) {
+    reasoning += 'Multiple high-confidence indicators suggest active scam attempt. Immediate caution advised.';
+  } else if (riskScore > 50) {
+    reasoning += 'Combination of signals indicates likely scam. Exercise caution.';
+  } else if (riskScore > 25) {
+    reasoning += 'Some suspicious patterns detected. Further verification recommended.';
+  } else {
+    reasoning += 'Low-level indicators present but not conclusive.';
+  }
+  
+  return reasoning;
+}
+
+// Reset persona and AI displays on new conversation
+function resetAIDisplays() {
+  document.getElementById('personaInfo').innerHTML = '<span style="font-family:\'Syne Mono\',monospace;font-size:11px;color:var(--muted)">No persona assigned yet</span>';
+  document.getElementById('aiReasoning').textContent = 'Awaiting analysis...';
+  document.getElementById('aiReasoning').style.color = 'var(--muted)';
+  document.getElementById('aiBadge').style.display = 'none';
 }
