@@ -21,7 +21,13 @@ const PRESETS = {
   tech: "Hello, this is Microsoft Technical Support. We detected a dangerous virus on your computer. Your system is sending error codes to our servers. Download our remote access tool immediately at support-microsoft-help.net to prevent data loss.",
   romance: "My darling, I am a widowed oil engineer working offshore in Nigeria. I have fallen deeply in love with you. I need $2,000 for my flight to meet you. Please send via Western Union to account 7734521890.",
   crypto: "CONGRATULATIONS! You have been selected for our exclusive Bitcoin investment program. Invest $500 today and receive $5,000 in 7 days — guaranteed 900% returns. Send BTC to wallet: bc1q9h7gd3kf8a2x...",
-  lottery: "You have WON the UK National Lottery — £850,000! To claim your prize, pay a £250 processing fee via iTunes gift cards. Contact: lottery-claims@prize-notification.com"
+  lottery: "You have WON the UK National Lottery — £850,000! To claim your prize, pay a £250 processing fee via iTunes gift cards. Contact: lottery-claims@prize-notification.com",
+  grandparent: "Grandma, it's me! I'm in trouble. I was in a car accident and I'm in jail. Please don't tell Mom and Dad. I need $5,000 for bail money right now. Send it to my lawyer via MoneyGram. This is urgent!",
+  amazon: "Amazon Security Alert: Suspicious order for iPhone 15 Pro ($1,299) detected on your account. If you did not authorize this purchase, call our fraud department immediately at 1-888-555-0847 to cancel.",
+  social: "Hi! I'm Sarah from Facebook Security Team. Your account has been reported for violating community standards and will be permanently deleted in 24 hours. Click here to appeal: fb-security-appeal.net/verify",
+  refund: "IRS Tax Refund Notice: You are eligible for a $2,847 tax refund. To process your refund, we need to verify your bank account details. Reply with your routing number and account number to expedite payment.",
+  job: "Congratulations! You've been selected for a work-from-home position earning $5,000/week. No experience needed! Just pay a one-time $299 training fee to get started. Limited spots available!",
+  charity: "Hello, I'm calling from the American Red Cross. We're collecting donations for hurricane victims. Can you donate $500 today? We accept wire transfers and gift cards for faster processing."
 };
 
 // Load preset into input and auto-send
