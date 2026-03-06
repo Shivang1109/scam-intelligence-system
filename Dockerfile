@@ -7,14 +7,16 @@ WORKDIR /app
 # Copy package files
 COPY package*.json ./
 COPY tsconfig.json ./
+COPY copy-public.js ./
 
 # Install dependencies
 RUN npm ci
 
-# Copy source code
+# Copy source code and public folder
 COPY src ./src
+COPY public ./public
 
-# Build TypeScript
+# Build TypeScript and copy public folder
 RUN npm run build
 
 # Production stage
@@ -31,6 +33,12 @@ RUN npm ci --only=production
 
 # Copy built files from builder
 COPY --from=builder /app/dist ./dist
+
+# Copy public folder for static files
+COPY public ./public
+
+# Copy simple-server.js
+COPY simple-server.js ./simple-server.js
 
 # Create non-root user
 RUN addgroup -g 1001 -S nodejs && \
@@ -50,4 +58,4 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
   CMD node -e "require('http').get('http://localhost:3000/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
 
 # Start application
-CMD ["node", "dist/app.js"]
+CMD ["node", "simple-server.js"]

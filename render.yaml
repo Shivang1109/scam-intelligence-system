@@ -5,7 +5,7 @@ services:
     env: node
     region: oregon
     plan: starter
-    buildCommand: npm ci && npm run build && ls -la public/ && echo "Public folder contents listed"
+    buildCommand: npm ci && npm run build
     startCommand: node simple-server.js
     envVars:
       - key: NODE_ENV
