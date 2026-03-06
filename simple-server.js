@@ -25,9 +25,24 @@ async function start() {
   // Serve static files FIRST (before API routes)
   const publicPath = path.join(__dirname, 'public');
   console.log('📁 Serving static files from:', publicPath);
+  console.log('📁 __dirname is:', __dirname);
+  console.log('📁 process.cwd() is:', process.cwd());
   console.log('📁 Directory exists:', require('fs').existsSync(publicPath));
-  console.log('📁 Files in public:', require('fs').existsSync(publicPath) ? require('fs').readdirSync(publicPath) : 'N/A');
-  app.use(express.static(publicPath));
+  
+  if (require('fs').existsSync(publicPath)) {
+    console.log('📁 Files in public:', require('fs').readdirSync(publicPath));
+    app.use(express.static(publicPath));
+  } else {
+    console.error('❌ ERROR: public folder not found at:', publicPath);
+    console.log('📁 Trying alternative path from cwd...');
+    const altPath = path.join(process.cwd(), 'public');
+    console.log('📁 Alternative path:', altPath);
+    console.log('📁 Alternative exists:', require('fs').existsSync(altPath));
+    if (require('fs').existsSync(altPath)) {
+      console.log('✅ Using alternative path');
+      app.use(express.static(altPath));
+    }
+  }
   
   // Initialize the Scam Intelligence System
   const scamApp = new Application();
