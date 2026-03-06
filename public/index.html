@@ -1,354 +1,124 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Cache-Control" content="no-cache">
-    <title>Scam Intelligence System - AI Defense Platform</title>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="styles.css">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ScamShield — AI Honeypot Intelligence</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne+Mono&family=Syne:wght@400;600;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-    <!-- Animated Background -->
-    <div class="animated-bg">
-        <canvas id="particleCanvas"></canvas>
-        <div class="grid-overlay"></div>
-        <div class="gradient-orb orb-1"></div>
-        <div class="gradient-orb orb-2"></div>
-        <div class="gradient-orb orb-3"></div>
-    </div>
+<div class="grid-bg"></div>
 
-    <!-- Hero Section -->
-    <section class="hero">
-        <div class="container">
-            <div class="hero-content">
-                <div class="badge-pill">
-                    <i class="fas fa-shield-halved"></i>
-                    <span>AI-Powered Protection</span>
-                </div>
-                <h1 class="hero-title">
-                    <span class="gradient-text">Scam Intelligence</span>
-                    <br>Defense System
-                </h1>
-                <p class="hero-subtitle">Real-time AI detection and analysis of sophisticated scam attempts</p>
-                
-                <div class="hero-stats">
-                    <div class="stat-card">
-                        <div class="stat-number" id="heroScans">0</div>
-                        <div class="stat-label">Scans Performed</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number" id="heroThreats">0</div>
-                        <div class="stat-label">Threats Blocked</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">98.5%</div>
-                        <div class="stat-label">Accuracy Rate</div>
-                    </div>
-                </div>
+<header>
+<div class="logo">
+<div class="logo-icon">⬡</div>
+<div class="logo-text">Scam<span>Shield</span></div>
+</div>
+<div style="display:flex;align-items:center;gap:24px;font-family:'Syne Mono',monospace;font-size:12px;color:var(--muted)">
+<span>AI HONEYPOT PLATFORM</span>
+<span id="totalScans" style="font-family:'Syne',sans-serif;font-weight:800;font-size:13px;color:var(--accent)">0 INTERCEPTS</span>
+<div class="header-status">
+<div class="pulse"></div>
+LIVE
+</div>
+</div>
+</header>
 
-                <button class="cta-button" onclick="scrollToAnalyzer()">
-                    <span>Start Analysis</span>
-                    <i class="fas fa-arrow-right"></i>
-                </button>
-            </div>
-        </div>
-    </section>
+<div class="layout">
+<!-- LEFT: CHAT -->
+<div class="chat-panel panel">
+<div class="panel-header">
+<span class="panel-title">// SCAMMER SIMULATION CONSOLE</span>
+<div style="display:flex;align-items:center;gap:10px">
+<span class="state-badge" id="convState">IDLE</span>
+<button class="new-conv-btn" onclick="newConversation()">↺ NEW SESSION</button>
+</div>
+</div>
 
-    <!-- Main Content -->
-    <div class="main-container">
-        <div class="container">
-            <!-- Quick Analyzer -->
-            <section id="analyzer" class="section">
-                <div class="glass-card analyzer-card">
-                    <div class="card-header">
-                        <div class="header-left">
-                            <div class="icon-wrapper">
-                                <i class="fas fa-microscope"></i>
-                            </div>
-                            <div>
-                                <h2>AI Threat Analyzer</h2>
-                                <p class="subtitle">Paste suspicious content for instant analysis</p>
-                            </div>
-                        </div>
-                        <div class="status-indicator">
-                            <span class="pulse-dot"></span>
-                            <span>System Active</span>
-                        </div>
-                    </div>
+<div class="chat-messages" id="chatMessages">
+<div class="empty-state">
+<div class="empty-icon">🎯</div>
+<div class="empty-text">SELECT A SCAM PRESET OR TYPE A MESSAGE<br>TO ENGAGE THE AI HONEYPOT AGENT</div>
+</div>
+</div>
 
-                    <div class="analyzer-body">
-                        <textarea id="analyzeInput" placeholder="Paste suspicious message, email, or text here..."></textarea>
-                        
-                        <div class="quick-examples">
-                            <span class="examples-label">Quick Tests:</span>
-                            <button class="example-chip" onclick="loadExample('phishing')">
-                                <i class="fas fa-fish"></i> Phishing
-                            </button>
-                            <button class="example-chip" onclick="loadExample('romance')">
-                                <i class="fas fa-heart-broken"></i> Romance
-                            </button>
-                            <button class="example-chip" onclick="loadExample('tech')">
-                                <i class="fas fa-laptop-code"></i> Tech Support
-                            </button>
-                            <button class="example-chip" onclick="loadExample('investment')">
-                                <i class="fas fa-chart-line"></i> Investment
-                            </button>
-                            <button class="example-chip" onclick="loadExample('lottery')">
-                                <i class="fas fa-trophy"></i> Lottery
-                            </button>
-                        </div>
+<div class="chat-input-area">
+<div class="scammer-presets">
+<span style="font-family:'Syne Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:1px;align-self:center">PRESETS ›</span>
+<button class="preset-btn" onclick="usePreset('irs')">🏛️ IRS</button>
+<button class="preset-btn" onclick="usePreset('bank')">🏦 BANK FRAUD</button>
+<button class="preset-btn" onclick="usePreset('tech')">💻 TECH SUPPORT</button>
+<button class="preset-btn" onclick="usePreset('romance')">💌 ROMANCE</button>
+<button class="preset-btn" onclick="usePreset('crypto')">₿ CRYPTO</button>
+<button class="preset-btn" onclick="usePreset('lottery')">🎰 LOTTERY</button>
+</div>
+<div class="input-row">
+<input class="chat-input" id="chatInput" placeholder="Type as the scammer..." onkeydown="if(event.key==='Enter')sendMessage()" />
+<button class="send-btn" id="sendBtn" onclick="sendMessage()">SEND ➤</button>
+</div>
+</div>
+</div>
 
-                        <div class="action-row">
-                            <button class="btn-primary" onclick="quickAnalyze()">
-                                <i class="fas fa-bolt"></i>
-                                <span>Analyze Threat</span>
-                            </button>
-                            <button class="btn-secondary" onclick="clearQuickAnalyze()">
-                                <i class="fas fa-times"></i>
-                                <span>Clear</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
+<!-- RIGHT COL -->
+<div class="right-col panel">
+<!-- Risk Meter -->
+<div class="risk-panel">
+<div style="font-family:'Syne Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--muted);margin-bottom:14px">THREAT ASSESSMENT</div>
+<div class="risk-display">
+<div class="risk-circle-wrap">
+<svg class="risk-svg" width="100" height="100" viewBox="0 0 100 100">
+<circle class="risk-track" cx="50" cy="50" r="40"/>
+<circle class="risk-fill" id="riskArc" cx="50" cy="50" r="40" stroke="var(--safe)"/>
+</svg>
+<div class="risk-number">
+<div class="risk-score-val" id="riskVal" style="color:var(--safe)">0</div>
+<div class="risk-score-label">/100</div>
+</div>
+</div>
+<div class="risk-info">
+<div class="risk-level-badge low" id="riskBadge">LOW RISK</div>
+<div class="scam-type" id="scamType">No threat detected</div>
+<div class="scam-confidence" id="scamConf">Awaiting data...</div>
+</div>
+</div>
+</div>
 
-                <!-- Results Section -->
-                <div id="resultsSection" class="results-section" style="display:none;">
-                    <!-- Threat Level Display -->
-                    <div class="glass-card threat-display" id="threatDisplay">
-                        <div class="threat-visual">
-                            <svg class="threat-circle" viewBox="0 0 200 200">
-                                <circle class="circle-bg" cx="100" cy="100" r="90"></circle>
-                                <circle class="circle-progress" id="threatCircle" cx="100" cy="100" r="90"></circle>
-                            </svg>
-                            <div class="threat-content">
-                                <div class="threat-score" id="threatScore">0</div>
-                                <div class="threat-label" id="threatLabel">Analyzing...</div>
-                            </div>
-                        </div>
-                        <div class="threat-details">
-                            <div class="threat-badge" id="threatBadge">
-                                <i class="fas fa-shield-alt"></i>
-                                <span>SCANNING</span>
-                            </div>
-                            <div class="threat-type" id="threatType"></div>
-                            <div class="threat-confidence" id="threatConfidence"></div>
-                            <div class="performance-metrics">
-                                <div class="metric-chip">
-                                    <i class="fas fa-bolt"></i>
-                                    <span id="analysisTime">0.0s</span>
-                                </div>
-                                <div class="metric-chip">
-                                    <i class="fas fa-brain"></i>
-                                    <span id="aiConfidence">0%</span>
-                                </div>
-                            </div>
-                            <button class="btn-share" onclick="shareAnalysis()">
-                                <i class="fas fa-share-alt"></i>
-                                <span>Share Analysis</span>
-                            </button>
-                        </div>
-                    </div>
+<!-- Signals -->
+<div class="signals-area">
+<div class="panel-header" style="padding:14px 20px;flex-shrink:0;">
+<span class="panel-title">// DETECTED SIGNALS</span>
+<span id="signalCount" style="font-family:'Syne Mono',monospace;font-size:11px;color:var(--muted)">0</span>
+</div>
+<div class="signals-scroll" id="signalsList">
+<div class="empty-state">
+<div class="empty-icon">📡</div>
+<div class="empty-text">MONITORING FOR SIGNALS</div>
+</div>
+</div>
+</div>
 
-                    <!-- Analysis Grid -->
-                    <div class="analysis-grid">
-                        <!-- Entities -->
-                        <div class="glass-card">
-                            <div class="card-mini-header">
-                                <i class="fas fa-bullseye"></i>
-                                <h3>Detected Entities</h3>
-                                <span class="count-badge" id="entityCount">0</span>
-                            </div>
-                            <div id="entitiesList" class="data-list"></div>
-                        </div>
+<!-- Entities -->
+<div class="entities-panel">
+<div style="font-family:'Syne Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--muted);margin-bottom:10px">EXTRACTED INTELLIGENCE</div>
+<div id="entitiesList">
+<span style="font-family:'Syne Mono',monospace;font-size:11px;color:var(--muted)">No entities extracted yet</span>
+</div>
+</div>
+</div>
+</div>
 
-                        <!-- Signals -->
-                        <div class="glass-card">
-                            <div class="card-mini-header">
-                                <i class="fas fa-exclamation-triangle"></i>
-                                <h3>Scam Signals</h3>
-                                <span class="count-badge" id="signalCount">0</span>
-                            </div>
-                            <div id="signalsList" class="data-list"></div>
-                        </div>
+<div class="statusbar">
+<div class="statusbar-item active">
+<div class="pulse" style="width:6px;height:6px"></div>
+HONEYPOT ONLINE
+</div>
+<div class="statusbar-item" id="sbMessages">MESSAGES: 0</div>
+<div class="statusbar-item" id="sbEntities">ENTITIES: 0</div>
+<div class="statusbar-item" id="sbConvId">SESSION: —</div>
+<div class="statusbar-item" style="margin-left:auto;color:var(--accent)">ScamShield v2.0 // AI Honeypot Intelligence</div>
+</div>
 
-                        <!-- Persona -->
-                        <div class="glass-card full-width">
-                            <div class="card-mini-header">
-                                <i class="fas fa-user-secret"></i>
-                                <h3>AI Persona Analysis</h3>
-                            </div>
-                            <div id="personaInfo" class="persona-display"></div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Live Conversation -->
-            <section class="section">
-                <div class="section-header">
-                    <h2 class="section-title">
-                        <i class="fas fa-comments"></i>
-                        Live Conversation Simulator
-                    </h2>
-                    <p class="section-subtitle">Watch our AI agent engage with potential scammers in real-time</p>
-                </div>
-
-                <div class="conversation-layout">
-                    <div class="glass-card chat-card">
-                        <div class="chat-header">
-                            <div class="chat-status">
-                                <span class="pulse-dot"></span>
-                                <span id="chatStatus">Ready</span>
-                            </div>
-                            <button class="btn-danger-small" onclick="terminateConversation()">
-                                <i class="fas fa-stop"></i> End
-                            </button>
-                        </div>
-                        <div id="chatMessages" class="chat-messages"></div>
-                        <div class="chat-input-wrapper">
-                            <input type="text" id="chatInput" placeholder="Type your message..." />
-                            <button class="btn-send" onclick="sendMessage()">
-                                <i class="fas fa-paper-plane"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="glass-card metrics-card">
-                        <h3 class="metrics-title">Real-Time Metrics</h3>
-                        <div class="metrics-list">
-                            <div class="metric-item">
-                                <span class="metric-label">Conversation State</span>
-                                <span class="metric-value badge" id="convState">Idle</span>
-                            </div>
-                            <div class="metric-item">
-                                <span class="metric-label">Risk Level</span>
-                                <div class="risk-bar">
-                                    <div class="risk-fill" id="convRiskBar" style="width: 0%"></div>
-                                </div>
-                                <span class="metric-value" id="convRisk">0%</span>
-                            </div>
-                            <div class="metric-item">
-                                <span class="metric-label">Messages</span>
-                                <span class="metric-value" id="convMessages">0</span>
-                            </div>
-                            <div class="metric-item">
-                                <span class="metric-label">Entities Detected</span>
-                                <span class="metric-value" id="convEntities">0</span>
-                            </div>
-                            <div class="metric-item">
-                                <span class="metric-label">Scam Signals</span>
-                                <span class="metric-value" id="convSignals">0</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Dashboard -->
-            <section class="section">
-                <div class="section-header">
-                    <h2 class="section-title">
-                        <i class="fas fa-chart-pie"></i>
-                        Intelligence Dashboard
-                    </h2>
-                </div>
-
-                <div class="dashboard-grid">
-                    <div class="glass-card stat-card-large">
-                        <i class="fas fa-shield-virus stat-icon"></i>
-                        <div class="stat-large" id="dashScans">0</div>
-                        <div class="stat-large-label">Total Scans</div>
-                    </div>
-                    <div class="glass-card stat-card-large danger">
-                        <i class="fas fa-skull-crossbones stat-icon"></i>
-                        <div class="stat-large" id="dashThreats">0</div>
-                        <div class="stat-large-label">Threats Detected</div>
-                    </div>
-                    <div class="glass-card stat-card-large success">
-                        <i class="fas fa-check-double stat-icon"></i>
-                        <div class="stat-large">98.5%</div>
-                        <div class="stat-large-label">Accuracy</div>
-                    </div>
-                </div>
-
-                <div class="glass-card chart-card">
-                    <h3 class="chart-title">Threat Distribution</h3>
-                    <div id="threatChart" class="threat-chart"></div>
-                </div>
-            </section>
-        </div>
-    </div>
-
-    <!-- Loading Overlay -->
-    <div id="loadingOverlay" class="loading-overlay">
-        <div class="loader">
-            <div class="loader-ring"></div>
-            <div class="loader-ring"></div>
-            <div class="loader-ring"></div>
-            <div class="loader-text">Analyzing with AI...</div>
-            <div class="loader-tip" id="loadingTip">Scanning for suspicious patterns...</div>
-        </div>
-    </div>
-
-    <!-- Toast Notifications -->
-    <div id="toastContainer" class="toast-container"></div>
-
-    <!-- Keyboard Shortcuts Help -->
-    <div id="shortcutsModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2><i class="fas fa-keyboard"></i> Keyboard Shortcuts</h2>
-                <button class="modal-close" onclick="closeShortcuts()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="shortcuts-grid">
-                <div class="shortcut-item">
-                    <kbd>Ctrl</kbd> + <kbd>Enter</kbd>
-                    <span>Analyze message</span>
-                </div>
-                <div class="shortcut-item">
-                    <kbd>?</kbd>
-                    <span>Show shortcuts</span>
-                </div>
-                <div class="shortcut-item">
-                    <kbd>Esc</kbd>
-                    <span>Close modals</span>
-                </div>
-                <div class="shortcut-item">
-                    <kbd>Ctrl</kbd> + <kbd>K</kbd>
-                    <span>Clear input</span>
-                </div>
-                <div class="shortcut-item">
-                    <kbd>Ctrl</kbd> + <kbd>S</kbd>
-                    <span>Share analysis</span>
-                </div>
-                <div class="shortcut-item">
-                    <kbd>T</kbd>
-                    <span>Toggle theme</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Theme Toggle -->
-    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Theme (T)">
-        <i class="fas fa-moon" id="themeIcon"></i>
-    </button>
-
-    <!-- Recent Scans Panel -->
-    <div class="recent-scans-panel" id="recentScansPanel">
-        <div class="panel-header">
-            <h3><i class="fas fa-history"></i> Recent Scans</h3>
-            <button class="panel-toggle" onclick="toggleRecentScans()">
-                <i class="fas fa-chevron-right"></i>
-            </button>
-        </div>
-        <div class="panel-content" id="recentScansList"></div>
-    </div>
-
-    <script src="app.js"></script>
+<script src="app.js"></script>
 </body>
 </html>
