@@ -23,8 +23,11 @@ async function start() {
   app.use(express.json());
   
   // Serve static files FIRST (before API routes)
-  console.log('📁 Serving static files from:', path.join(__dirname, 'public'));
-  app.use(express.static(path.join(__dirname, 'public')));
+  const publicPath = path.join(__dirname, 'public');
+  console.log('📁 Serving static files from:', publicPath);
+  console.log('📁 Directory exists:', require('fs').existsSync(publicPath));
+  console.log('📁 Files in public:', require('fs').existsSync(publicPath) ? require('fs').readdirSync(publicPath) : 'N/A');
+  app.use(express.static(publicPath));
   
   // Initialize the Scam Intelligence System
   const scamApp = new Application();
@@ -37,6 +40,17 @@ async function start() {
     // Mount the API routes (they're already prefixed with /api/v1 and /health)
     app.use(apiApp);
   }
+  
+  // Fallback route - serve index.html for any non-API routes (SPA support)
+  app.use((req, res, next) => {
+    // Don't intercept API routes or health check
+    if (req.path.startsWith('/api') || req.path.startsWith('/health')) {
+      return next();
+    }
+    const indexPath = path.join(__dirname, 'public', 'index.html');
+    console.log('📄 Serving index.html for:', req.path);
+    res.sendFile(indexPath);
+  });
   
   // Start server - bind to 0.0.0.0 for Render
   app.listen(port, '0.0.0.0', () => {
