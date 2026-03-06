@@ -1,8 +1,8 @@
 // ScamShield - AI Honeypot Intelligence Platform
 // Frontend Application Logic
 
-// Get API key from environment or use test key (never hardcode in production!)
-const API_KEY = window.SCAMSHIELD_API_KEY || 'test-api-key-12345';
+// API key for demo (hardcoded for hackathon - would use env vars in production)
+const API_KEY = 'test-api-key-12345';
 const API_URL = '/api/v1';
 
 // State
