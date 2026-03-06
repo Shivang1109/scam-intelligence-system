@@ -12,6 +12,7 @@ import { NLPExtractor } from './nlp/NLPExtractor';
 import { ScamSignalDetector } from './nlp/ScamSignalDetector';
 import { ScamClassifier } from './scoring/ScamClassifier';
 import { RiskScorer } from './scoring/RiskScorer';
+import { HybridAnalyzer } from './ai/HybridAnalyzer';
 import { ReportGenerator } from './reporting/ReportGenerator';
 import { InMemoryConversationRepository } from './persistence/InMemoryConversationRepository';
 import { InMemoryReportRepository } from './persistence/InMemoryReportRepository';
@@ -40,6 +41,15 @@ export class Application {
     const nlpExtractor = new NLPExtractor();
     const signalDetector = new ScamSignalDetector();
 
+    // Initialize AI components
+    console.log('🤖 Initializing AI components...');
+    const hybridAnalyzer = new HybridAnalyzer(process.env.OPENAI_API_KEY);
+    if (hybridAnalyzer.isAIEnabled()) {
+      console.log('✅ AI enhancement enabled (OpenAI)');
+    } else {
+      console.log('⚠️  AI enhancement disabled (no API key) - using rule-based only');
+    }
+
     // Initialize scoring components
     console.log('📊 Initializing scoring components...');
     const scamClassifier = new ScamClassifier();
@@ -62,13 +72,14 @@ export class Application {
       signalDetector,
       scamClassifier,
       riskScorer,
-      conversationRepository
+      conversationRepository,
+      hybridAnalyzer
     );
 
     // Initialize API server
     console.log('🌐 Initializing API server...');
     const port = parseInt(process.env.PORT || '3000', 10);
-    this.server = new APIServer(port, this.agentController, reportRepository);
+    this.server = new APIServer(port, this.agentController, reportRepository, hybridAnalyzer);
 
     console.log('✅ All components initialized successfully');
   }

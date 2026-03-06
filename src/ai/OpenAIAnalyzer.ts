@@ -158,4 +158,95 @@ Analyze carefully and provide accurate results.`;
   isEnabled(): boolean {
     return this.enabled;
   }
+
+  /**
+   * Generate a persona-appropriate response using AI
+   */
+  async generatePersonaResponse(
+    persona: any,
+    scammerMessage: string,
+    conversationContext: string[],
+    intent: string
+  ): Promise<string | null> {
+    if (!this.enabled) {
+      return null;
+    }
+
+    try {
+      const prompt = this.buildPersonaPrompt(persona, scammerMessage, conversationContext, intent);
+      const response = await this.callOpenAI(prompt);
+      return this.parsePersonaResponse(response);
+    } catch (error) {
+      console.error('OpenAI persona response generation failed:', error);
+      return null;
+    }
+  }
+
+  /**
+   * Build prompt for persona response generation
+   */
+  private buildPersonaPrompt(
+    persona: any,
+    scammerMessage: string,
+    conversationContext: string[],
+    intent: string
+  ): string {
+    const contextStr = conversationContext.length > 0
+      ? `\n\nConversation history:\n${conversationContext.join('\n')}`
+      : '';
+
+    return `You are roleplaying as a vulnerable persona in a scam detection honeypot system. Your goal is to engage the scammer naturally while extracting information.
+
+Persona Details:
+- Name: ${persona.name}
+- Age: ${persona.age}
+- Background: ${persona.background}
+- Vulnerability Level: ${persona.vulnerabilityLevel}/10 (higher = more vulnerable)
+- Tech Savvy: ${persona.characteristics.techSavvy}/10 (lower = less technical)
+- Trust Level: ${persona.characteristics.trustLevel}/10 (higher = more trusting)
+- Financial Awareness: ${persona.characteristics.financialAwareness}/10 (lower = less aware)
+- Communication Style: ${persona.communicationStyle}
+
+Current Intent: ${intent}
+
+Scammer's latest message: "${scammerMessage}"${contextStr}
+
+Generate a single, natural response that:
+1. Stays in character as ${persona.name}
+2. Matches the persona's communication style and characteristics
+3. Shows appropriate vulnerability level
+4. Encourages the scammer to reveal more information (phone numbers, payment details, URLs, etc.)
+5. Sounds human and believable
+6. Is 1-3 sentences long
+7. Matches the intent: ${intent}
+
+IMPORTANT:
+- Do NOT break character
+- Do NOT reveal you're an AI or honeypot
+- Do NOT use overly formal language if persona is casual
+- Do NOT be too tech-savvy if persona has low tech skills
+- Show appropriate confusion, concern, or trust based on persona traits
+
+Respond with ONLY the persona's message, no explanations or meta-commentary.`;
+  }
+
+  /**
+   * Parse persona response from AI
+   */
+  private parsePersonaResponse(response: string): string {
+    // Clean up the response
+    let cleaned = response.trim();
+    
+    // Remove quotes if AI wrapped the response
+    if ((cleaned.startsWith('"') && cleaned.endsWith('"')) ||
+        (cleaned.startsWith("'") && cleaned.endsWith("'"))) {
+      cleaned = cleaned.slice(1, -1);
+    }
+    
+    // Remove any meta-commentary that might have slipped through
+    const lines = cleaned.split('\n');
+    const firstLine = lines[0].trim();
+    
+    return firstLine;
+  }
 }

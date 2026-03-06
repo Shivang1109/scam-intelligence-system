@@ -8,8 +8,10 @@ import cors from 'cors';
 import morgan from 'morgan';
 import { errorHandler, requestLogger } from './middleware';
 import { AgentController } from '../agents/AgentController';
+import { HybridAnalyzer } from '../ai/HybridAnalyzer';
 import { createConversationRoutes } from './routes/conversations';
 import { createReportRoutes } from './routes/reports';
+import { createAnalyzeRoutes } from './routes/analyze';
 import { ReportRepository } from '../persistence/interfaces';
 
 export class APIServer {
@@ -17,16 +19,19 @@ export class APIServer {
   private port: number;
   private agentController?: AgentController;
   private reportRepository?: ReportRepository;
+  private hybridAnalyzer?: HybridAnalyzer;
 
   constructor(
     port: number = 3000, 
     agentController?: AgentController,
-    reportRepository?: ReportRepository
+    reportRepository?: ReportRepository,
+    hybridAnalyzer?: HybridAnalyzer
   ) {
     this.app = express();
     this.port = port;
     this.agentController = agentController;
     this.reportRepository = reportRepository;
+    this.hybridAnalyzer = hybridAnalyzer;
     this.setupMiddleware();
     this.setupRoutes();
     this.setupStaticFiles();  // Add static files AFTER routes but BEFORE error handling
@@ -79,6 +84,7 @@ export class APIServer {
         endpoints: {
           conversations: '/api/v1/conversations',
           reports: '/api/v1/reports',
+          analyze: '/api/v1/analyze',
           health: '/health',
           metrics: '/api/v1/metrics',
         },
@@ -95,6 +101,12 @@ export class APIServer {
     if (this.reportRepository) {
       const reportRoutes = createReportRoutes(this.reportRepository);
       this.app.use('/api/v1/reports', reportRoutes);
+    }
+
+    // Instant analysis routes
+    if (this.hybridAnalyzer) {
+      const analyzeRoutes = createAnalyzeRoutes(this.hybridAnalyzer);
+      this.app.use('/api/v1/analyze', analyzeRoutes);
     }
 
     // TODO: Add route handlers for metrics

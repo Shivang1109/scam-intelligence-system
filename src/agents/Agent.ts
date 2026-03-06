@@ -19,6 +19,7 @@ import { NLPExtractor } from '../nlp/NLPExtractor';
 import { ScamSignalDetector } from '../nlp/ScamSignalDetector';
 import { ScamClassifier } from '../scoring/ScamClassifier';
 import { RiskScorer } from '../scoring/RiskScorer';
+import { HybridAnalyzer } from '../ai/HybridAnalyzer';
 import { logger } from '../utils/logger';
 
 import { v4 as uuidv4 } from 'uuid';
@@ -35,6 +36,7 @@ export class Agent {
   private signalDetector: ScamSignalDetector;
   private scamClassifier: ScamClassifier;
   private riskScorer: RiskScorer;
+  private hybridAnalyzer?: HybridAnalyzer;
   private messageCount: number = 0;
   private unproductiveCount: number = 0; // Track unproductive exchanges
   
@@ -52,7 +54,8 @@ export class Agent {
     signalDetector: ScamSignalDetector,
     scamClassifier: ScamClassifier,
     riskScorer: RiskScorer,
-    isRestoration: boolean = false
+    isRestoration: boolean = false,
+    hybridAnalyzer?: HybridAnalyzer
   ) {
     this.stateMachine = stateMachine;
     this.personaManager = personaManager;
@@ -60,6 +63,7 @@ export class Agent {
     this.signalDetector = signalDetector;
     this.scamClassifier = scamClassifier;
     this.riskScorer = riskScorer;
+    this.hybridAnalyzer = hybridAnalyzer;
 
     // Initialize conversation (skip if this is a restoration)
     if (!isRestoration) {
@@ -161,27 +165,74 @@ export class Agent {
     this.messageCount++;
     this.conversation.metadata.messageCount = this.messageCount;
 
-    // Extract entities from message
-    const entities = this.nlpExtractor.extractEntities(message, this.conversation.id);
-    this.conversation.extractedEntities.push(...entities);
+    // Extract entities and detect signals using HybridAnalyzer if available
+    if (this.hybridAnalyzer) {
+      try {
+        const analysis = await this.hybridAnalyzer.analyze(message);
+        
+        // Use AI-enhanced results
+        this.conversation.extractedEntities.push(...analysis.entities);
+        this.conversation.scamSignals.push(...analysis.signals);
+        
+        // Update classification with AI results
+        this.conversation.classification = analysis.classification;
+        this.conversation.riskScore = analysis.riskScore;
+        
+        // Log AI enhancement
+        if (analysis.aiEnhanced) {
+          logger.info('AI-enhanced analysis', {
+            conversationId: this.conversation.id,
+            component: 'Agent',
+            aiReasoning: analysis.aiReasoning,
+            riskScore: analysis.riskScore,
+          });
+        }
+        
+        // Track productivity based on AI results
+        if (analysis.entities.length === 0 && analysis.signals.length === 0) {
+          this.unproductiveCount++;
+        } else {
+          this.unproductiveCount = 0;
+        }
+      } catch (error) {
+        console.error('HybridAnalyzer failed, falling back to rule-based:', error);
+        // Fall back to rule-based analysis
+        const entities = this.nlpExtractor.extractEntities(message, this.conversation.id);
+        this.conversation.extractedEntities.push(...entities);
 
-    // Detect scam signals
-    const signals = this.signalDetector.detectSignals(message, this.conversation.id);
-    this.conversation.scamSignals.push(...signals);
+        const signals = this.signalDetector.detectSignals(message, this.conversation.id);
+        this.conversation.scamSignals.push(...signals);
 
-    // Track productivity - if no new entities or signals, increment unproductive count
-    if (entities.length === 0 && signals.length === 0) {
-      this.unproductiveCount++;
+        if (entities.length === 0 && signals.length === 0) {
+          this.unproductiveCount++;
+        } else {
+          this.unproductiveCount = 0;
+        }
+        
+        // Update classification and risk score
+        this.conversation.classification = this.scamClassifier.classify(this.conversation);
+        const riskScore = this.riskScorer.calculateScore(this.conversation);
+        this.conversation.riskScore = riskScore.score;
+      }
     } else {
-      this.unproductiveCount = 0; // Reset on productive exchange
+      // Rule-based analysis only
+      const entities = this.nlpExtractor.extractEntities(message, this.conversation.id);
+      this.conversation.extractedEntities.push(...entities);
+
+      const signals = this.signalDetector.detectSignals(message, this.conversation.id);
+      this.conversation.scamSignals.push(...signals);
+
+      if (entities.length === 0 && signals.length === 0) {
+        this.unproductiveCount++;
+      } else {
+        this.unproductiveCount = 0;
+      }
+      
+      // Update classification and risk score
+      this.conversation.classification = this.scamClassifier.classify(this.conversation);
+      const riskScore = this.riskScorer.calculateScore(this.conversation);
+      this.conversation.riskScore = riskScore.score;
     }
-
-    // Update classification
-    this.conversation.classification = this.scamClassifier.classify(this.conversation);
-
-    // Update risk score
-    const riskScore = this.riskScorer.calculateScore(this.conversation);
-    this.conversation.riskScore = riskScore.score;
 
     // Update conversation timestamp
     this.conversation.updatedAt = new Date();
@@ -472,6 +523,7 @@ export class Agent {
   /**
    * Generate response based on current conversation state
    * Maintains persona consistency
+   * Uses AI if available for more natural responses
    */
   private async generateResponse(): Promise<Response> {
     const state = this.conversation.state;
@@ -484,22 +536,18 @@ export class Agent {
     switch (state) {
       case ConversationState.INITIAL_CONTACT:
         intent = 'greeting';
-        responseContent = this.generateInitialContactResponse();
         break;
 
       case ConversationState.ENGAGEMENT:
         intent = 'build_trust';
-        responseContent = this.generateEngagementResponse();
         break;
 
       case ConversationState.INFORMATION_GATHERING:
         intent = 'gather_information';
-        responseContent = this.generateInformationGatheringResponse();
         break;
 
       case ConversationState.EXTRACTION:
         intent = 'extract_entities';
-        responseContent = this.generateExtractionResponse();
         break;
 
       case ConversationState.TERMINATION:
@@ -508,11 +556,64 @@ export class Agent {
         break;
 
       default:
-        responseContent = this.personaManager.generateResponse(
+        intent = 'default';
+    }
+
+    // Try AI-powered response generation first
+    if (this.hybridAnalyzer && state !== ConversationState.TERMINATION) {
+      try {
+        // Get conversation context (last 5 messages)
+        const contextMessages = this.conversation.messages
+          .slice(-10)
+          .map(m => `${m.sender === 'scammer' ? 'Scammer' : persona.name}: ${m.content}`);
+
+        const aiResponse = await this.hybridAnalyzer.generateResponse(
           persona,
           this.getLastScammerMessage(),
-          'default'
+          contextMessages,
+          intent
         );
+
+        if (aiResponse) {
+          responseContent = aiResponse;
+          logger.info('AI-generated response', {
+            conversationId: this.conversation.id,
+            component: 'Agent',
+            intent,
+            responseLength: aiResponse.length,
+          });
+        }
+      } catch (error) {
+        console.error('AI response generation failed, falling back to rule-based:', error);
+      }
+    }
+
+    // Fall back to rule-based response generation if AI not available or failed
+    if (!responseContent) {
+      switch (state) {
+        case ConversationState.INITIAL_CONTACT:
+          responseContent = this.generateInitialContactResponse();
+          break;
+
+        case ConversationState.ENGAGEMENT:
+          responseContent = this.generateEngagementResponse();
+          break;
+
+        case ConversationState.INFORMATION_GATHERING:
+          responseContent = this.generateInformationGatheringResponse();
+          break;
+
+        case ConversationState.EXTRACTION:
+          responseContent = this.generateExtractionResponse();
+          break;
+
+        default:
+          responseContent = this.personaManager.generateResponse(
+            persona,
+            this.getLastScammerMessage(),
+            'default'
+          );
+      }
     }
 
     // Calculate response delay based on persona
@@ -528,6 +629,7 @@ export class Agent {
         state,
         intent,
         personaId: persona.id,
+        aiGenerated: !!this.hybridAnalyzer,
       },
     };
   }

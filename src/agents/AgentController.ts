@@ -13,6 +13,7 @@ import { NLPExtractor } from '../nlp/NLPExtractor';
 import { ScamSignalDetector } from '../nlp/ScamSignalDetector';
 import { ScamClassifier } from '../scoring/ScamClassifier';
 import { RiskScorer } from '../scoring/RiskScorer';
+import { HybridAnalyzer } from '../ai/HybridAnalyzer';
 import { ConversationRepository } from '../persistence/interfaces';
 import { logger } from '../utils/logger';
 
@@ -30,6 +31,7 @@ export class AgentController {
   private signalDetector: ScamSignalDetector;
   private scamClassifier: ScamClassifier;
   private riskScorer: RiskScorer;
+  private hybridAnalyzer?: HybridAnalyzer;
   private conversationRepository?: ConversationRepository;
   private stalledCheckInterval: number = 60000; // Check every 60 seconds
   private stalledCheckTimer?: NodeJS.Timeout;
@@ -41,7 +43,8 @@ export class AgentController {
     signalDetector: ScamSignalDetector,
     scamClassifier: ScamClassifier,
     riskScorer: RiskScorer,
-    conversationRepository?: ConversationRepository
+    conversationRepository?: ConversationRepository,
+    hybridAnalyzer?: HybridAnalyzer
   ) {
     this.agents = new Map();
     this.stateMachine = stateMachine;
@@ -51,6 +54,7 @@ export class AgentController {
     this.scamClassifier = scamClassifier;
     this.riskScorer = riskScorer;
     this.conversationRepository = conversationRepository;
+    this.hybridAnalyzer = hybridAnalyzer;
 
     // Start stalled conversation detection
     this.startStalledConversationDetection();
@@ -73,7 +77,9 @@ export class AgentController {
       this.nlpExtractor,
       this.signalDetector,
       this.scamClassifier,
-      this.riskScorer
+      this.riskScorer,
+      false,
+      this.hybridAnalyzer
     );
 
     // Add agent to pool

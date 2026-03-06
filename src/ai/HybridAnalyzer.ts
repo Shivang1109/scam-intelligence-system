@@ -249,4 +249,30 @@ export class HybridAnalyzer {
   isAIEnabled(): boolean {
     return this.aiAnalyzer.isEnabled();
   }
+
+  /**
+   * Generate AI-powered persona response
+   */
+  async generateResponse(
+    persona: any,
+    scammerMessage: string,
+    conversationContext: string[],
+    intent: string
+  ): Promise<string | null> {
+    if (!this.aiAnalyzer.isEnabled()) {
+      return null;
+    }
+
+    try {
+      return await this.aiAnalyzer.generatePersonaResponse(
+        persona,
+        scammerMessage,
+        conversationContext,
+        intent
+      );
+    } catch (error) {
+      console.error('AI response generation failed:', error);
+      return null;
+    }
+  }
 }
