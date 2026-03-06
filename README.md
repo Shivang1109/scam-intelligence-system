@@ -189,11 +189,8 @@ Key variables:
 
 ## 📦 Project Files
 
-- **START_HERE.md** - Quick start guide for local deployment
-- **LOCAL_DEPLOYMENT.md** - Detailed local deployment instructions
-- **GETTING_STARTED.md** - API usage examples and testing
 - **README.md** - This file
-- **.kiro/specs/** - Design specifications and requirements
+- **LICENSE** - MIT License
 
 ## 🛠️ Development
 
@@ -213,11 +210,10 @@ src/
 
 ### Adding New Features
 
-1. Update requirements in `.kiro/specs/scam-intelligence-system/requirements.md`
-2. Update design in `.kiro/specs/scam-intelligence-system/design.md`
-3. Add tasks to `.kiro/specs/scam-intelligence-system/tasks.md`
-4. Implement with tests
-5. Update documentation
+1. Create a feature branch
+2. Implement with tests
+3. Update documentation
+4. Submit a pull request
 
 ## 🤝 Contributing
 
@@ -350,8 +346,4 @@ MIT
 
 ## Documentation
 
-For detailed design and requirements documentation, see:
-
-- `.kiro/specs/scam-intelligence-system/requirements.md`
-- `.kiro/specs/scam-intelligence-system/design.md`
-- `.kiro/specs/scam-intelligence-system/tasks.md`
+For detailed API documentation and usage examples, see the inline code documentation and type definitions in the `src/` directory.
