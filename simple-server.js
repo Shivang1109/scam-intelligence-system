@@ -48,6 +48,22 @@ async function start() {
   const scamApp = new Application();
   await scamApp.initialize();
   
+  // Debug endpoint to check filesystem
+  app.get('/debug/files', (req, res) => {
+    const fs = require('fs');
+    const debugInfo = {
+      __dirname,
+      'process.cwd()': process.cwd(),
+      'publicPath': path.join(__dirname, 'public'),
+      'publicExists': fs.existsSync(path.join(__dirname, 'public')),
+      'publicFiles': fs.existsSync(path.join(__dirname, 'public')) ? fs.readdirSync(path.join(__dirname, 'public')) : [],
+      'rootFiles': fs.readdirSync(__dirname).filter(f => !f.startsWith('.')),
+      'distExists': fs.existsSync(path.join(__dirname, 'dist')),
+      'nodeModulesExists': fs.existsSync(path.join(__dirname, 'node_modules'))
+    };
+    res.json(debugInfo);
+  });
+
   // Get the API server and mount its routes
   const apiServer = scamApp.getServer();
   if (apiServer) {
