@@ -353,7 +353,24 @@ header {
 .right-col { 
   display: flex; 
   flex-direction: column; 
-  overflow: hidden; 
+  overflow-y: auto; 
+  overflow-x: hidden;
+  max-height: calc(100vh - 80px);
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) var(--surface);
+}
+
+.right-col::-webkit-scrollbar {
+  width: 6px;
+}
+
+.right-col::-webkit-scrollbar-track {
+  background: var(--surface);
+}
+
+.right-col::-webkit-scrollbar-thumb {
+  background: var(--accent);
+  border-radius: 3px;
 }
 
 .risk-panel { 
@@ -1170,4 +1187,60 @@ header {
 
 #conversationDuration.active {
   animation: timerPulse 2s ease-in-out infinite;
+}
+
+/* API Status Indicator */
+.api-status {
+  font-family: 'Syne Mono', monospace;
+  font-size: 11px;
+  padding: 4px 12px;
+  border-radius: 4px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.api-connecting {
+  background: rgba(245, 166, 35, 0.15);
+  color: var(--warn);
+  border: 1px solid rgba(245, 166, 35, 0.3);
+}
+
+.api-connected {
+  background: rgba(0, 219, 180, 0.15);
+  color: var(--accent);
+  border: 1px solid rgba(0, 219, 180, 0.3);
+}
+
+.api-offline {
+  background: rgba(255, 75, 110, 0.15);
+  color: var(--danger);
+  border: 1px solid rgba(255, 75, 110, 0.3);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* Critical Risk Alert (WOW Moment) */
+.risk-panel.critical-alert {
+  animation: criticalPulse 0.5s ease-in-out 3;
+  border: 2px solid var(--danger);
+  box-shadow: 0 0 30px rgba(255, 75, 110, 0.5), inset 0 0 20px rgba(255, 75, 110, 0.1);
+}
+
+@keyframes criticalPulse {
+  0%, 100% {
+    transform: scale(1);
+    border-color: var(--danger);
+  }
+  50% {
+    transform: scale(1.02);
+    border-color: #ff6b8a;
+    box-shadow: 0 0 40px rgba(255, 75, 110, 0.8), inset 0 0 30px rgba(255, 75, 110, 0.2);
+  }
+}
+
+/* System message style */
+.msg.system {
+  background: rgba(245, 166, 35, 0.1);
+  border-left: 3px solid var(--warn);
+  font-family: 'Syne Mono', monospace;
+  font-size: 12px;
 }

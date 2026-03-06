@@ -1,7 +1,8 @@
 // ScamShield - AI Honeypot Intelligence Platform
 // Frontend Application Logic
 
-const API_KEY = 'test-api-key-12345';
+// Get API key from environment or use test key (never hardcode in production!)
+const API_KEY = window.SCAMSHIELD_API_KEY || 'test-api-key-12345';
 const API_URL = '/api/v1';
 
 // State
@@ -11,6 +12,7 @@ let entityCount = 0;
 let signalCount = 0;
 let totalScans = 0;
 let allEntities = new Set();
+let isApiAvailable = true; // Track API availability
 
 // Scam Presets
 const PRESETS = {
@@ -22,10 +24,13 @@ const PRESETS = {
   lottery: "You have WON the UK National Lottery — £850,000! To claim your prize, pay a £250 processing fee via iTunes gift cards. Contact: lottery-claims@prize-notification.com"
 };
 
-// Load preset into input
+// Load preset into input and auto-send
 function usePreset(type) {
-  document.getElementById('chatInput').value = PRESETS[type];
-  document.getElementById('chatInput').focus();
+  const input = document.getElementById('chatInput');
+  input.value = PRESETS[type];
+  input.focus();
+  // Auto-send after a brief moment for visual feedback
+  setTimeout(() => sendMessage(), 300);
 }
 
 // Start new conversation
@@ -77,6 +82,9 @@ async function sendMessage() {
   addMessage('scammer', msg);
   addTypingIndicator();
   
+  // Show API status indicator
+  showApiStatus('connecting');
+  
   try {
     let data;
     
@@ -88,7 +96,8 @@ async function sendMessage() {
           'Content-Type': 'application/json',
           'X-API-Key': API_KEY
         },
-        body: JSON.stringify({ initialMessage: msg })
+        body: JSON.stringify({ initialMessage: msg }),
+        signal: AbortSignal.timeout(10000) // 10 second timeout
       });
       
       if (!res.ok) throw new Error(res.status);
@@ -97,6 +106,8 @@ async function sendMessage() {
       conversationId = data.conversationId || data.id;
       document.getElementById('sbConvId').textContent = 'SESSION: ' + conversationId.substring(0, 8).toUpperCase();
       
+      isApiAvailable = true;
+      showApiStatus('connected');
       setTimeout(refreshConversation, 300);
       removeTypingIndicator();
       addMessage('agent', data.message || 'Tell me more...');
@@ -108,19 +119,25 @@ async function sendMessage() {
           'Content-Type': 'application/json',
           'X-API-Key': API_KEY
         },
-        body: JSON.stringify({ message: msg })
+        body: JSON.stringify({ message: msg }),
+        signal: AbortSignal.timeout(10000) // 10 second timeout
       });
       
       if (!res.ok) throw new Error(res.status);
       
       data = await res.json();
+      isApiAvailable = true;
+      showApiStatus('connected');
       setTimeout(refreshConversation, 300);
       removeTypingIndicator();
       addMessage('agent', data.content || data.message || 'Processing...');
     }
   } catch (e) {
     console.error('API Error:', e);
+    isApiAvailable = false;
+    showApiStatus('offline');
     removeTypingIndicator();
+    addMessage('system', '⚠️ API unavailable - using local analysis mode');
     simulateLocalAnalysis(msg);
   }
   
@@ -418,6 +435,48 @@ function updateRisk(score, label, type, conf) {
   
   document.getElementById('scamType').textContent = type;
   document.getElementById('scamConf').textContent = conf;
+  
+  // WOW MOMENT: Critical risk alert
+  if (score >= 80) {
+    triggerCriticalAlert();
+  }
+}
+
+// Show API connection status
+function showApiStatus(status) {
+  const statusEl = document.getElementById('apiStatus');
+  if (!statusEl) return;
+  
+  statusEl.className = 'api-status api-' + status;
+  if (status === 'connecting') {
+    statusEl.textContent = '⏳ CONNECTING...';
+    statusEl.style.display = 'block';
+  } else if (status === 'connected') {
+    statusEl.textContent = '✓ API CONNECTED';
+    setTimeout(() => statusEl.style.display = 'none', 2000);
+  } else if (status === 'offline') {
+    statusEl.textContent = '⚠️ OFFLINE MODE';
+    statusEl.style.display = 'block';
+  }
+}
+
+// Trigger critical risk alert (WOW moment)
+function triggerCriticalAlert() {
+  const riskPanel = document.querySelector('.risk-meter');
+  if (!riskPanel) return;
+  
+  // Add pulsing red border
+  riskPanel.classList.add('critical-alert');
+  
+  // Play alert sound (optional - can be muted)
+  try {
+    const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIGGS57OihUBELTKXh8bllHAU2jdXvzn0pBSh+zPDajzsKElyx6OyrWBUIQ5zd8sFuJAUuhM/z2Ik2CBdju+zooVARC0yl4fG5ZRwFNo3V7859KQUofsz');
+    audio.volume = 0.3;
+    audio.play().catch(() => {});
+  } catch (e) {}
+  
+  // Remove after animation
+  setTimeout(() => riskPanel.classList.remove('critical-alert'), 3000);
 }
 
 // Update state badge
