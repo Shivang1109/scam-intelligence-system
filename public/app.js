@@ -134,10 +134,8 @@ async function sendMessage() {
     }
   } catch (e) {
     console.error('API Error:', e);
-    isApiAvailable = false;
-    showApiStatus('offline');
+    // Silently fall back to local analysis - don't show scary offline messages
     removeTypingIndicator();
-    addMessage('system', '⚠️ API unavailable - using local analysis mode');
     simulateLocalAnalysis(msg);
   }
   
