@@ -16,13 +16,14 @@ async function start() {
   
   // Create Express app
   const app = express();
-  const port = 3000;
+  const port = process.env.PORT || 3000;
   
-  // Middleware
+  // Middleware - CORS and JSON parsing
   app.use(cors());
   app.use(express.json());
   
-  // Serve static files from public directory
+  // Serve static files FIRST (before API routes)
+  console.log('📁 Serving static files from:', path.join(__dirname, 'public'));
   app.use(express.static(path.join(__dirname, 'public')));
   
   // Initialize the Scam Intelligence System
@@ -33,11 +34,12 @@ async function start() {
   const apiServer = scamApp.getServer();
   if (apiServer) {
     const apiApp = apiServer.getApp();
+    // Mount the API routes (they're already prefixed with /api/v1 and /health)
     app.use(apiApp);
   }
   
-  // Start server
-  app.listen(port, () => {
+  // Start server - bind to 0.0.0.0 for Render
+  app.listen(port, '0.0.0.0', () => {
     console.log(`\n✅ Prototype Server Running!`);
     console.log(`\n📱 Frontend: http://localhost:${port}`);
     console.log(`🔗 API: http://localhost:${port}/api/v1`);

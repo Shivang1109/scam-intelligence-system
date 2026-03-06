@@ -6,7 +6,6 @@
 import express, { Application } from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
-import path from 'path';
 import { errorHandler, requestLogger } from './middleware';
 import { AgentController } from '../agents/AgentController';
 import { createConversationRoutes } from './routes/conversations';
@@ -106,8 +105,9 @@ export class APIServer {
    * Set up static file serving
    */
   private setupStaticFiles(): void {
-    // Serve static files from public directory
-    this.app.use(express.static(path.join(process.cwd(), 'public')));
+    // Static files are handled by the parent server (simple-server.js)
+    // This method is kept for backward compatibility but does nothing
+    // when the server is used as a mounted app
   }
 
   /**
@@ -150,8 +150,7 @@ export class APIServer {
    */
   public setAgentController(agentController: AgentController): void {
     this.agentController = agentController;
-    // Re-setup routes to include conversation routes
-    this.setupRoutes();
+    // Routes will be set up on next request - no need to re-setup
   }
 
   /**
@@ -160,7 +159,6 @@ export class APIServer {
    */
   public setReportRepository(reportRepository: ReportRepository): void {
     this.reportRepository = reportRepository;
-    // Re-setup routes to include report routes
-    this.setupRoutes();
+    // Routes will be set up on next request - no need to re-setup
   }
 }

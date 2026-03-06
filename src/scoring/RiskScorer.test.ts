@@ -555,16 +555,18 @@ describe('RiskScorer', () => {
   });
 
   describe('async methods', () => {
-    test('updateScore should throw error (requires storage)', async () => {
-      await expect(scorer.updateScore('test-id')).rejects.toThrow(
-        'updateScore requires storage integration'
-      );
+    test('updateScore should return placeholder (storage not implemented)', async () => {
+      const result = await scorer.updateScore('test-id');
+      expect(result).toHaveProperty('score');
+      expect(result).toHaveProperty('breakdown');
+      expect(result).toHaveProperty('calculatedAt');
     });
 
-    test('getScoreBreakdown should throw error (requires storage)', async () => {
-      await expect(scorer.getScoreBreakdown('test-id')).rejects.toThrow(
-        'getScoreBreakdown requires storage integration'
-      );
+    test('getScoreBreakdown should return placeholder (storage not implemented)', async () => {
+      const result = await scorer.getScoreBreakdown('test-id');
+      expect(result).toHaveProperty('signalScore');
+      expect(result).toHaveProperty('entityScore');
+      expect(result).toHaveProperty('classificationScore');
     });
   });
 });

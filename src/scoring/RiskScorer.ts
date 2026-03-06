@@ -77,16 +77,21 @@ export class RiskScorer implements IRiskScorer {
    * Validates Requirements: 6.5
    */
   async updateScore(conversationId: string): Promise<RiskScore> {
-    // In a real implementation, this would:
-    // 1. Fetch the conversation from storage
-    // 2. Recalculate the risk score
-    // 3. Update the stored score
-    // 4. Return the new score
+    // TODO: Implement storage integration
+    // For now, return a placeholder score
+    console.warn(`updateScore called for ${conversationId} but storage integration not implemented`);
     
-    throw new Error(
-      `updateScore requires storage integration. ` +
-      `ConversationId: ${conversationId}`
-    );
+    return {
+      score: 0,
+      breakdown: {
+        signalScore: 0,
+        entityScore: 0,
+        classificationScore: 0,
+        urgencyScore: 0,
+        financialScore: 0,
+      },
+      calculatedAt: new Date(),
+    };
   }
 
   /**
@@ -94,15 +99,17 @@ export class RiskScorer implements IRiskScorer {
    * Validates Requirements: 6.6
    */
   async getScoreBreakdown(conversationId: string): Promise<ScoreBreakdown> {
-    // In a real implementation, this would:
-    // 1. Fetch the conversation from storage
-    // 2. Calculate the risk score
-    // 3. Return the breakdown
+    // TODO: Implement storage integration
+    // For now, return a placeholder breakdown
+    console.warn(`getScoreBreakdown called for ${conversationId} but storage integration not implemented`);
     
-    throw new Error(
-      `getScoreBreakdown requires storage integration. ` +
-      `ConversationId: ${conversationId}`
-    );
+    return {
+      signalScore: 0,
+      entityScore: 0,
+      classificationScore: 0,
+      urgencyScore: 0,
+      financialScore: 0,
+    };
   }
 
   /**

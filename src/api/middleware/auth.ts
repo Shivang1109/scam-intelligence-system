@@ -32,15 +32,17 @@ interface APIKeyStore {
  * In-memory API key store
  * In production, this would be replaced with database storage
  */
-const apiKeyStore: APIKeyStore = {
-  // Default test API key for development
-  'test-api-key-12345': {
+const apiKeyStore: APIKeyStore = {};
+
+// Initialize with test key from environment if available
+if (process.env.TEST_API_KEY) {
+  apiKeyStore[process.env.TEST_API_KEY] = {
     clientId: 'test-client-1',
     name: 'Test Client',
     permissions: ['read', 'write'],
     createdAt: new Date(),
-  },
-};
+  };
+}
 
 /**
  * Add an API key to the store
@@ -78,8 +80,9 @@ export function getAllAPIKeys(): APIKeyStore {
  * Clear all API keys (for testing purposes)
  */
 export function clearAPIKeys(): void {
+  const testKey = process.env.TEST_API_KEY;
   Object.keys(apiKeyStore).forEach((key) => {
-    if (key !== 'test-api-key-12345') {
+    if (key !== testKey) {
       delete apiKeyStore[key];
     }
   });

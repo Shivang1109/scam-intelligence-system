@@ -329,7 +329,12 @@ describe('Authentication Middleware', () => {
       expect(getAllAPIKeys()['temp-key']).toBeUndefined();
     });
 
-    it('should clear all API keys except default test key', () => {
+    it('should clear all API keys except test key from environment', () => {
+      // Set up test environment
+      const originalTestKey = process.env.TEST_API_KEY;
+      process.env.TEST_API_KEY = 'test-key-from-env';
+      
+      addAPIKey('test-key-from-env', 'test-client', 'Test Client');
       addAPIKey('key-1', 'client-1', 'Client 1');
       addAPIKey('key-2', 'client-2', 'Client 2');
 
@@ -338,7 +343,10 @@ describe('Authentication Middleware', () => {
       const keys = getAllAPIKeys();
       expect(keys['key-1']).toBeUndefined();
       expect(keys['key-2']).toBeUndefined();
-      expect(keys['test-api-key-12345']).toBeDefined(); // Default key should remain
+      expect(keys['test-key-from-env']).toBeDefined(); // Test key from env should remain
+      
+      // Restore original
+      process.env.TEST_API_KEY = originalTestKey;
     });
 
     it('should get all API keys', () => {

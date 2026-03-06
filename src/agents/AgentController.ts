@@ -16,16 +16,7 @@ import { RiskScorer } from '../scoring/RiskScorer';
 import { ConversationRepository } from '../persistence/interfaces';
 import { logger } from '../utils/logger';
 
-/**
- * Simple UUID generator
- */
-function generateUUID(): string {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-    const r = (Math.random() * 16) | 0;
-    const v = c === 'x' ? r : (r & 0x3) | 0x8;
-    return v.toString(16);
-  });
-}
+import { v4 as uuidv4 } from 'uuid';
 
 /**
  * AgentController manages the lifecycle of multiple conversation agents
@@ -71,7 +62,7 @@ export class AgentController {
    */
   async createConversation(initialMessage: string): Promise<Conversation> {
     // Generate unique conversation ID
-    const conversationId = generateUUID();
+    const conversationId = uuidv4();
 
     // Create new agent instance for this conversation
     const agent = new Agent(

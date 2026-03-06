@@ -21,16 +21,7 @@ import { ScamClassifier } from '../scoring/ScamClassifier';
 import { RiskScorer } from '../scoring/RiskScorer';
 import { logger } from '../utils/logger';
 
-/**
- * Simple UUID generator
- */
-function generateUUID(): string {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
-    const r = (Math.random() * 16) | 0;
-    const v = c === 'x' ? r : (r & 0x3) | 0x8;
-    return v.toString(16);
-  });
-}
+import { v4 as uuidv4 } from 'uuid';
 
 /**
  * Agent class manages a single conversation
@@ -161,7 +152,7 @@ export class Agent {
     
     // Add scammer message to conversation
     const scammerMessage: Message = {
-      id: generateUUID(),
+      id: uuidv4(),
       sender: 'scammer',
       content: message,
       timestamp: new Date(),
@@ -217,7 +208,7 @@ export class Agent {
 
     // Add system response to conversation
     const systemMessage: Message = {
-      id: generateUUID(),
+      id: uuidv4(),
       sender: 'system',
       content: response.content,
       timestamp: new Date(),
