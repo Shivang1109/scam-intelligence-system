@@ -31,8 +31,12 @@ LIVE
 <div class="panel-header">
 <span class="panel-title">// SCAMMER SIMULATION CONSOLE</span>
 <div style="display:flex;align-items:center;gap:10px">
+<span id="conversationDuration" style="font-family:'Syne Mono',monospace;font-size:11px;color:var(--accent);display:none">⏱ 00:00</span>
 <span class="state-badge" id="convState">IDLE</span>
 <button class="new-conv-btn" onclick="newConversation()">↺ NEW SESSION</button>
+<button class="export-btn" id="exportBtn" onclick="exportConversation()" style="display:none" title="Export conversation as JSON">
+<i class="fas fa-download"></i>
+</button>
 </div>
 </div>
 
@@ -124,6 +128,14 @@ Awaiting analysis...
 <div style="font-family:'Syne Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--muted);margin-bottom:10px">ACTIVE PERSONA</div>
 <div id="personaInfo">
 <span style="font-family:'Syne Mono',monospace;font-size:11px;color:var(--muted)">No persona assigned yet</span>
+</div>
+</div>
+
+<!-- State History -->
+<div class="state-history-panel">
+<div style="font-family:'Syne Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--muted);margin-bottom:10px">STATE TIMELINE</div>
+<div id="stateHistory" class="state-timeline">
+<span style="font-family:'Syne Mono',monospace;font-size:11px;color:var(--muted)">No state transitions yet</span>
 </div>
 </div>
 </div>

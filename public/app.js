@@ -573,3 +573,173 @@ function resetAIDisplays() {
   document.getElementById('aiReasoning').style.color = 'var(--muted)';
   document.getElementById('aiBadge').style.display = 'none';
 }
+
+
+// ============================================
+// POLISH FEATURES
+// ============================================
+
+// Conversation Duration Timer
+let conversationStartTime = null;
+let durationInterval = null;
+
+function startDurationTimer() {
+  conversationStartTime = Date.now();
+  const durationEl = document.getElementById('conversationDuration');
+  durationEl.style.display = 'inline';
+  durationEl.classList.add('active');
+  
+  // Update every second
+  durationInterval = setInterval(() => {
+    if (conversationStartTime) {
+      const elapsed = Date.now() - conversationStartTime;
+      const minutes = Math.floor(elapsed / 60000);
+      const seconds = Math.floor((elapsed % 60000) / 1000);
+      durationEl.textContent = `⏱ ${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    }
+  }, 1000);
+}
+
+function stopDurationTimer() {
+  if (durationInterval) {
+    clearInterval(durationInterval);
+    durationInterval = null;
+  }
+  conversationStartTime = null;
+  const durationEl = document.getElementById('conversationDuration');
+  durationEl.style.display = 'none';
+  durationEl.classList.remove('active');
+  durationEl.textContent = '⏱ 00:00';
+}
+
+// State History Timeline
+let stateHistory = [];
+
+function addStateTransition(state, timestamp) {
+  const elapsed = conversationStartTime ? Date.now() - conversationStartTime : 0;
+  const minutes = Math.floor(elapsed / 60000);
+  const seconds = Math.floor((elapsed % 60000) / 1000);
+  const timeStr = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+  
+  stateHistory.push({
+    state: state,
+    time: timeStr,
+    timestamp: timestamp || Date.now()
+  });
+  
+  updateStateTimeline();
+}
+
+function updateStateTimeline() {
+  const container = document.getElementById('stateHistory');
+  
+  if (stateHistory.length === 0) {
+    container.innerHTML = '<span style="font-family:\'Syne Mono\',monospace;font-size:11px;color:var(--muted)">No state transitions yet</span>';
+    return;
+  }
+  
+  container.innerHTML = stateHistory.map((item, index) => {
+    const isLast = index === stateHistory.length - 1;
+    return `
+      <div class="state-transition ${isLast ? 'current' : ''}">
+        <span class="state-transition-time">${item.time}</span>
+        <span class="state-transition-arrow">→</span>
+        <span class="state-transition-name">${item.state}</span>
+      </div>
+    `;
+  }).join('');
+  
+  // Scroll to bottom
+  container.scrollTop = container.scrollHeight;
+}
+
+function clearStateHistory() {
+  stateHistory = [];
+  updateStateTimeline();
+}
+
+// Export Conversation
+function exportConversation() {
+  if (!conversationId) {
+    showToast('No active conversation to export', 'warn');
+    return;
+  }
+  
+  // Gather all conversation data
+  const exportData = {
+    conversationId: conversationId,
+    timestamp: new Date().toISOString(),
+    duration: document.getElementById('conversationDuration').textContent,
+    messages: Array.from(document.getElementById('chatMessages').querySelectorAll('.msg')).map(msg => ({
+      sender: msg.classList.contains('msg-scammer') ? 'scammer' : 'agent',
+      content: msg.querySelector('.msg-bubble').textContent,
+      label: msg.querySelector('.msg-label').textContent
+    })),
+    riskScore: parseInt(document.getElementById('riskVal').textContent) || 0,
+    riskLevel: document.getElementById('riskBadge').textContent,
+    scamType: document.getElementById('scamType').textContent,
+    signals: Array.from(document.getElementById('signalsList').querySelectorAll('.signal-item')).map(sig => ({
+      type: sig.querySelector('.signal-name').textContent,
+      confidence: sig.querySelector('.signal-conf').textContent,
+      text: sig.querySelector('.signal-text').textContent
+    })),
+    entities: Array.from(document.getElementById('entitiesList').querySelectorAll('.entity-chip')).map(ent => ({
+      type: ent.className.split(' ').find(c => c.startsWith('entity-')).replace('entity-', ''),
+      value: ent.textContent.trim().substring(2) // Remove icon
+    })),
+    persona: document.getElementById('personaInfo').querySelector('.persona-name')?.textContent || 'Unknown',
+    aiReasoning: document.getElementById('aiReasoning').textContent,
+    stateHistory: stateHistory,
+    stats: {
+      totalMessages: messageCount,
+      totalEntities: entityCount,
+      totalSignals: signalCount
+    }
+  };
+  
+  // Create and download JSON file
+  const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `scamshield-conversation-${conversationId.substring(0, 8)}-${Date.now()}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+  
+  showToast('✅ Conversation exported successfully', 'success');
+  playSound('success');
+}
+
+// Update existing functions to use new features
+const originalSendMessage = sendMessage;
+sendMessage = async function() {
+  // Start timer on first message
+  if (!conversationId && !conversationStartTime) {
+    startDurationTimer();
+    addStateTransition('IDLE', Date.now());
+  }
+  
+  // Show export button
+  document.getElementById('exportBtn').style.display = 'inline-flex';
+  
+  return originalSendMessage();
+};
+
+const originalUpdateState = updateState;
+updateState = function(state) {
+  const prevState = document.getElementById('convState').textContent;
+  if (prevState !== state) {
+    addStateTransition(state, Date.now());
+  }
+  return originalUpdateState(state);
+};
+
+const originalNewConversation = newConversation;
+newConversation = function() {
+  stopDurationTimer();
+  clearStateHistory();
+  document.getElementById('exportBtn').style.display = 'none';
+  return originalNewConversation();
+};
