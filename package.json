@@ -4,7 +4,7 @@
   "description": "AI-powered honeypot for autonomous scammer engagement and intelligence extraction",
   "main": "dist/index.js",
   "scripts": {
-    "build": "tsc && cp -r public dist/public",
+    "build": "tsc && node copy-public.js",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
