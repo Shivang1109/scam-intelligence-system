@@ -20,6 +20,7 @@ import { ScamSignalDetector } from '../nlp/ScamSignalDetector';
 import { ScamClassifier } from '../scoring/ScamClassifier';
 import { RiskScorer } from '../scoring/RiskScorer';
 import { HybridAnalyzer } from '../ai/HybridAnalyzer';
+import { ClaudePersonaEngine } from '../ai/ClaudePersonaEngine';
 import { logger } from '../utils/logger';
 
 import { v4 as uuidv4 } from 'uuid';
@@ -37,6 +38,7 @@ export class Agent {
   private scamClassifier: ScamClassifier;
   private riskScorer: RiskScorer;
   private hybridAnalyzer?: HybridAnalyzer;
+  private claudeEngine?: ClaudePersonaEngine;
   private messageCount: number = 0;
   private unproductiveCount: number = 0; // Track unproductive exchanges
   
@@ -55,7 +57,8 @@ export class Agent {
     scamClassifier: ScamClassifier,
     riskScorer: RiskScorer,
     isRestoration: boolean = false,
-    hybridAnalyzer?: HybridAnalyzer
+    hybridAnalyzer?: HybridAnalyzer,
+    claudeEngine?: ClaudePersonaEngine
   ) {
     this.stateMachine = stateMachine;
     this.personaManager = personaManager;
@@ -64,6 +67,7 @@ export class Agent {
     this.scamClassifier = scamClassifier;
     this.riskScorer = riskScorer;
     this.hybridAnalyzer = hybridAnalyzer;
+    this.claudeEngine = claudeEngine;
 
     // Initialize conversation (skip if this is a restoration)
     if (!isRestoration) {
@@ -559,8 +563,32 @@ export class Agent {
         intent = 'default';
     }
 
-    // Try AI-powered response generation first
-    if (this.hybridAnalyzer && state !== ConversationState.TERMINATION) {
+    // Try Claude-powered response generation FIRST (most natural)
+    if (this.claudeEngine && this.claudeEngine.isEnabled() && state !== ConversationState.TERMINATION) {
+      try {
+        const claudeResponse = await this.claudeEngine.generateResponse(
+          persona,
+          this.getLastScammerMessage(),
+          this.conversation.messages,
+          state
+        );
+
+        if (claudeResponse) {
+          responseContent = claudeResponse;
+          logger.info('Claude-generated response', {
+            conversationId: this.conversation.id,
+            component: 'Agent',
+            intent,
+            responseLength: claudeResponse.length,
+          });
+        }
+      } catch (error) {
+        logger.warn('Claude response generation failed, trying HybridAnalyzer');
+      }
+    }
+
+    // Try HybridAnalyzer (OpenAI) as second option
+    if (!responseContent && this.hybridAnalyzer && state !== ConversationState.TERMINATION) {
       try {
         // Get conversation context (last 5 messages)
         const contextMessages = this.conversation.messages
@@ -576,7 +604,7 @@ export class Agent {
 
         if (aiResponse) {
           responseContent = aiResponse;
-          logger.info('AI-generated response', {
+          logger.info('AI-generated response (HybridAnalyzer)', {
             conversationId: this.conversation.id,
             component: 'Agent',
             intent,
@@ -584,7 +612,7 @@ export class Agent {
           });
         }
       } catch (error) {
-        console.error('AI response generation failed, falling back to rule-based:', error);
+        logger.warn('AI response generation failed, falling back to rule-based');
       }
     }
 

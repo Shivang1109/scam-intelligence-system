@@ -50,6 +50,15 @@ export class Application {
       console.log('⚠️  AI enhancement disabled (no API key) - using rule-based only');
     }
 
+    // Initialize Claude Persona Engine
+    const { ClaudePersonaEngine } = await import('./ai/ClaudePersonaEngine');
+    const claudeEngine = new ClaudePersonaEngine(process.env.ANTHROPIC_API_KEY);
+    if (claudeEngine.isEnabled()) {
+      console.log('✅ Claude Persona Engine enabled');
+    } else {
+      console.log('⚠️  Claude Persona Engine disabled (no API key) - using fallback responses');
+    }
+
     // Initialize scoring components
     console.log('📊 Initializing scoring components...');
     const scamClassifier = new ScamClassifier();
@@ -73,7 +82,8 @@ export class Application {
       scamClassifier,
       riskScorer,
       conversationRepository,
-      hybridAnalyzer
+      hybridAnalyzer,
+      claudeEngine
     );
 
     // Initialize API server

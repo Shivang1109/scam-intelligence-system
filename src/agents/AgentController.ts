@@ -14,6 +14,7 @@ import { ScamSignalDetector } from '../nlp/ScamSignalDetector';
 import { ScamClassifier } from '../scoring/ScamClassifier';
 import { RiskScorer } from '../scoring/RiskScorer';
 import { HybridAnalyzer } from '../ai/HybridAnalyzer';
+import { ClaudePersonaEngine } from '../ai/ClaudePersonaEngine';
 import { ConversationRepository } from '../persistence/interfaces';
 import { logger } from '../utils/logger';
 
@@ -32,6 +33,7 @@ export class AgentController {
   private scamClassifier: ScamClassifier;
   private riskScorer: RiskScorer;
   private hybridAnalyzer?: HybridAnalyzer;
+  private claudeEngine?: ClaudePersonaEngine;
   private conversationRepository?: ConversationRepository;
   private stalledCheckInterval: number = 60000; // Check every 60 seconds
   private stalledCheckTimer?: NodeJS.Timeout;
@@ -44,7 +46,8 @@ export class AgentController {
     scamClassifier: ScamClassifier,
     riskScorer: RiskScorer,
     conversationRepository?: ConversationRepository,
-    hybridAnalyzer?: HybridAnalyzer
+    hybridAnalyzer?: HybridAnalyzer,
+    claudeEngine?: ClaudePersonaEngine
   ) {
     this.agents = new Map();
     this.stateMachine = stateMachine;
@@ -55,6 +58,7 @@ export class AgentController {
     this.riskScorer = riskScorer;
     this.conversationRepository = conversationRepository;
     this.hybridAnalyzer = hybridAnalyzer;
+    this.claudeEngine = claudeEngine;
 
     // Start stalled conversation detection
     this.startStalledConversationDetection();
@@ -79,7 +83,8 @@ export class AgentController {
       this.scamClassifier,
       this.riskScorer,
       false,
-      this.hybridAnalyzer
+      this.hybridAnalyzer,
+      this.claudeEngine
     );
 
     // Add agent to pool
