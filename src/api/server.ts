@@ -6,6 +6,7 @@
 import express, { Application } from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
+import path from 'path';
 import { errorHandler, requestLogger } from './middleware';
 import { AgentController } from '../agents/AgentController';
 import { HybridAnalyzer } from '../ai/HybridAnalyzer';
@@ -117,9 +118,26 @@ export class APIServer {
    * Set up static file serving
    */
   private setupStaticFiles(): void {
-    // Static files are handled by the parent server (simple-server.js)
-    // This method is kept for backward compatibility but does nothing
-    // when the server is used as a mounted app
+    // Serve static files from public directory
+    // Check multiple possible locations
+    const possiblePaths = [
+      path.join(process.cwd(), 'public'),
+      path.join(process.cwd(), 'dist', 'public'),
+      path.join(__dirname, '..', '..', 'public')
+    ];
+    
+    for (const publicPath of possiblePaths) {
+      try {
+        const fs = require('fs');
+        if (fs.existsSync(publicPath)) {
+          this.app.use(express.static(publicPath));
+          console.log(`📁 Serving static files from: ${publicPath}`);
+          break;
+        }
+      } catch (error) {
+        // Continue to next path
+      }
+    }
   }
 
   /**
@@ -154,23 +172,5 @@ export class APIServer {
    */
   public getPort(): number {
     return this.port;
-  }
-
-  /**
-   * Set the agent controller
-   * Useful for setting up the controller after server initialization
-   */
-  public setAgentController(agentController: AgentController): void {
-    this.agentController = agentController;
-    // Routes will be set up on next request - no need to re-setup
-  }
-
-  /**
-   * Set the report repository
-   * Useful for setting up the repository after server initialization
-   */
-  public setReportRepository(reportRepository: ReportRepository): void {
-    this.reportRepository = reportRepository;
-    // Routes will be set up on next request - no need to re-setup
   }
 }

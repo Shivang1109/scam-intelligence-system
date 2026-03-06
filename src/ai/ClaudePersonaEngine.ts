@@ -8,7 +8,7 @@ import { logger } from '../utils/logger';
 
 export class ClaudePersonaEngine {
   private apiKey: string | undefined;
-  private model: string = 'claude-3-5-haiku-20241022'; // Fast and cheap
+  private model: string = 'claude-3-5-haiku-20241022'; // Current stable model
   private enabled: boolean = false;
 
   constructor(apiKey?: string) {

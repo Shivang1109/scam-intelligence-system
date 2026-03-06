@@ -587,34 +587,9 @@ export class Agent {
       }
     }
 
-    // Try HybridAnalyzer (OpenAI) as second option
-    if (!responseContent && this.hybridAnalyzer && state !== ConversationState.TERMINATION) {
-      try {
-        // Get conversation context (last 5 messages)
-        const contextMessages = this.conversation.messages
-          .slice(-10)
-          .map(m => `${m.sender === 'scammer' ? 'Scammer' : persona.name}: ${m.content}`);
-
-        const aiResponse = await this.hybridAnalyzer.generateResponse(
-          persona,
-          this.getLastScammerMessage(),
-          contextMessages,
-          intent
-        );
-
-        if (aiResponse) {
-          responseContent = aiResponse;
-          logger.info('AI-generated response (HybridAnalyzer)', {
-            conversationId: this.conversation.id,
-            component: 'Agent',
-            intent,
-            responseLength: aiResponse.length,
-          });
-        }
-      } catch (error) {
-        logger.warn('AI response generation failed, falling back to rule-based');
-      }
-    }
+    // Try HybridAnalyzer (OpenAI) as second option - currently not available
+    // HybridAnalyzer doesn't have generateResponse method, only analyze()
+    // Skipping AI fallback and going straight to rule-based responses
 
     // Fall back to rule-based response generation if AI not available or failed
     if (!responseContent) {
