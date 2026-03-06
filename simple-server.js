@@ -23,25 +23,32 @@ async function start() {
   app.use(express.json());
   
   // Serve static files FIRST (before API routes)
-  const publicPath = path.join(__dirname, 'public');
-  console.log('📁 Serving static files from:', publicPath);
+  // Try multiple locations for public folder
+  const possiblePaths = [
+    path.join(__dirname, 'public'),
+    path.join(__dirname, 'dist', 'public'),
+    path.join(process.cwd(), 'public')
+  ];
+  
+  let publicPath = null;
+  for (const testPath of possiblePaths) {
+    if (require('fs').existsSync(testPath)) {
+      publicPath = testPath;
+      break;
+    }
+  }
+  
+  console.log('📁 Checking paths:', possiblePaths);
   console.log('📁 __dirname is:', __dirname);
   console.log('📁 process.cwd() is:', process.cwd());
-  console.log('📁 Directory exists:', require('fs').existsSync(publicPath));
   
-  if (require('fs').existsSync(publicPath)) {
+  if (publicPath) {
+    console.log('✅ Found public folder at:', publicPath);
     console.log('📁 Files in public:', require('fs').readdirSync(publicPath));
     app.use(express.static(publicPath));
   } else {
-    console.error('❌ ERROR: public folder not found at:', publicPath);
-    console.log('📁 Trying alternative path from cwd...');
-    const altPath = path.join(process.cwd(), 'public');
-    console.log('📁 Alternative path:', altPath);
-    console.log('📁 Alternative exists:', require('fs').existsSync(altPath));
-    if (require('fs').existsSync(altPath)) {
-      console.log('✅ Using alternative path');
-      app.use(express.static(altPath));
-    }
+    console.error('❌ ERROR: public folder not found in any location');
+    console.log('📁 Available files in __dirname:', require('fs').readdirSync(__dirname).filter(f => !f.startsWith('.')));
   }
   
   // Initialize the Scam Intelligence System
@@ -54,9 +61,16 @@ async function start() {
     const debugInfo = {
       __dirname,
       'process.cwd()': process.cwd(),
-      'publicPath': path.join(__dirname, 'public'),
-      'publicExists': fs.existsSync(path.join(__dirname, 'public')),
-      'publicFiles': fs.existsSync(path.join(__dirname, 'public')) ? fs.readdirSync(path.join(__dirname, 'public')) : [],
+      'paths_checked': [
+        path.join(__dirname, 'public'),
+        path.join(__dirname, 'dist', 'public'),
+        path.join(process.cwd(), 'public')
+      ],
+      'public_exists': fs.existsSync(path.join(__dirname, 'public')),
+      'dist_public_exists': fs.existsSync(path.join(__dirname, 'dist', 'public')),
+      'cwd_public_exists': fs.existsSync(path.join(process.cwd(), 'public')),
+      'public_files': fs.existsSync(path.join(__dirname, 'public')) ? fs.readdirSync(path.join(__dirname, 'public')) : [],
+      'dist_public_files': fs.existsSync(path.join(__dirname, 'dist', 'public')) ? fs.readdirSync(path.join(__dirname, 'dist', 'public')) : [],
       'rootFiles': fs.readdirSync(__dirname).filter(f => !f.startsWith('.')),
       'distExists': fs.existsSync(path.join(__dirname, 'dist')),
       'nodeModulesExists': fs.existsSync(path.join(__dirname, 'node_modules'))
