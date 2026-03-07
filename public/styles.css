@@ -25,6 +25,7 @@ body {
   min-height: 100vh; 
   overflow-x: hidden;
   overflow-y: auto;
+  scroll-behavior: smooth;
 }
 
 .dashboard-container {
@@ -288,11 +289,11 @@ header {
 }
 
 .layout { 
-  display: grid; 
-  grid-template-columns: 68% 32%; 
-  gap: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
   padding: 24px 32px;
-  max-width: 1920px;
+  max-width: 1600px;
   margin: 0 auto;
 }
 
@@ -322,9 +323,12 @@ header {
 .chat-panel { 
   display: flex; 
   flex-direction: column; 
-  border-right: 1px solid var(--border);
+  border: 1px solid var(--border);
+  border-radius: 12px;
   margin-bottom: 0;
-  height: 550px;
+  height: 650px;
+  background: var(--surface);
+  overflow: hidden;
 }
 
 .chat-messages { 
@@ -334,7 +338,22 @@ header {
   display: flex; 
   flex-direction: column; 
   gap: 18px; 
-  scroll-behavior: smooth; 
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) var(--surface);
+}
+
+.chat-messages::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chat-messages::-webkit-scrollbar-track {
+  background: var(--surface);
+}
+
+.chat-messages::-webkit-scrollbar-thumb {
+  background: var(--accent);
+  border-radius: 3px;
 }
 
 .chat-messages::-webkit-scrollbar { 
@@ -379,8 +398,11 @@ header {
   padding: 12px 16px; 
   border-radius: 12px; 
   font-size: 14px; 
-  line-height: 1.55; 
+  line-height: 1.6; 
   position: relative;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  max-width: 100%;
 }
 
 .msg-signals {
@@ -607,9 +629,10 @@ header {
 }
 
 .right-col { 
-  display: flex; 
-  flex-direction: column;
-  gap: 20px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  width: 100%;
 }
 
 .dashboard-section {
@@ -620,7 +643,12 @@ header {
   margin-bottom: 0;
 }
 
-/* Consistent card styling for right panel */
+/* Full width sections */
+.dashboard-section.full-width {
+  grid-column: 1 / -1;
+}
+
+/* Consistent card styling */
 .right-col .panel-header,
 .right-col .section-title {
   padding: 16px 20px;
@@ -631,14 +659,21 @@ header {
 }
 
 /* Risk Panel */
+/* Risk Panel */
 .risk-panel { 
   padding: 20px; 
-  border-bottom: 1px solid var(--border); 
+  border: 1px solid var(--border);
   background: var(--surface2); 
   flex-shrink: 0;
   min-height: auto;
   border-radius: 12px;
   width: 100%;
+  transition: all 0.3s ease;
+}
+
+.risk-panel:hover {
+  border-color: rgba(0, 219, 180, 0.4);
+  box-shadow: 0 4px 16px rgba(0, 219, 180, 0.1);
 }
 
 .risk-display { 
@@ -793,9 +828,17 @@ header {
   display: flex; 
   flex-direction: column; 
   overflow: hidden;
+  border: 1px solid var(--border);
   border-radius: 12px;
   width: 100%;
   padding: 0;
+  background: var(--surface);
+  transition: all 0.3s ease;
+}
+
+.signals-area:hover {
+  border-color: rgba(0, 219, 180, 0.4);
+  box-shadow: 0 4px 16px rgba(0, 219, 180, 0.1);
 }
 
 .signals-scroll { 
@@ -924,7 +967,7 @@ header {
 
 /* Detected Intelligence Panel */
 .intelligence-panel {
-  border-top: 1px solid var(--border);
+  border: 1px solid var(--border);
   min-height: 240px;
   max-height: none;
   flex-shrink: 0;
@@ -934,6 +977,13 @@ header {
   border-radius: 12px;
   width: 100%;
   padding: 0;
+  background: var(--surface);
+  transition: all 0.3s ease;
+}
+
+.intelligence-panel:hover {
+  border-color: rgba(0, 219, 180, 0.4);
+  box-shadow: 0 4px 16px rgba(0, 219, 180, 0.1);
 }
 
 .intelligence-grid {
@@ -1022,7 +1072,7 @@ header {
 
 /* Threat Connections Panel */
 .connections-panel {
-  border-top: 1px solid var(--border);
+  border: 1px solid var(--border);
   padding: 20px;
   background: var(--surface2);
   min-height: 120px;
@@ -1031,6 +1081,12 @@ header {
   flex-shrink: 0;
   border-radius: 12px;
   width: 100%;
+  transition: all 0.3s ease;
+}
+
+.connections-panel:hover {
+  border-color: rgba(0, 219, 180, 0.4);
+  box-shadow: 0 4px 16px rgba(0, 219, 180, 0.1);
 }
 
 .connections-panel::-webkit-scrollbar {
@@ -1340,7 +1396,7 @@ header {
 
 /* AI Analysis Panel */
 .ai-panel {
-  border-top: 1px solid var(--border);
+  border: 1px solid var(--border);
   padding: 20px;
   background: rgba(0, 219, 180, 0.03);
   min-height: 80px;
@@ -1349,6 +1405,12 @@ header {
   flex-shrink: 0;
   border-radius: 12px;
   width: 100%;
+  transition: all 0.3s ease;
+}
+
+.ai-panel:hover {
+  border-color: rgba(0, 219, 180, 0.4);
+  box-shadow: 0 4px 16px rgba(0, 219, 180, 0.1);
 }
 
 .ai-panel::-webkit-scrollbar {
@@ -1385,7 +1447,7 @@ header {
 
 /* Persona Panel */
 .persona-panel {
-  border-top: 1px solid var(--border);
+  border: 1px solid var(--border);
   padding: 20px;
   background: var(--surface2);
   min-height: 100px;
@@ -1394,6 +1456,12 @@ header {
   flex-shrink: 0;
   border-radius: 12px;
   width: 100%;
+  transition: all 0.3s ease;
+}
+
+.persona-panel:hover {
+  border-color: rgba(0, 219, 180, 0.4);
+  box-shadow: 0 4px 16px rgba(0, 219, 180, 0.1);
 }
 
 .persona-panel::-webkit-scrollbar {
@@ -1546,26 +1614,69 @@ header {
   color: #f9a8d4;
 }
 
-/* Responsive adjustments */
-@media (max-width: 1400px) {
-  .layout {
-    grid-template-columns: 1fr 340px;
-  }
-  
-  .ai-panel,
-  .persona-panel {
-    max-height: 120px;
-  }
-}
-
+/* Responsive Design */
 @media (max-width: 1200px) {
   .layout {
-    grid-template-columns: 1fr;
+    padding: 20px 24px;
+    gap: 28px;
   }
   
   .right-col {
-    border-top: 1px solid var(--border);
-    border-left: none;
+    grid-template-columns: 1fr;
+  }
+  
+  .chat-panel {
+    height: 550px;
+  }
+}
+
+@media (max-width: 768px) {
+  .layout {
+    padding: 16px;
+    gap: 24px;
+  }
+  
+  .global-metrics {
+    padding: 20px 16px 24px 16px;
+  }
+  
+  .metrics-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  
+  .chat-panel {
+    height: 500px;
+  }
+  
+  .summary-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  
+  .system-status-bar {
+    padding: 10px 16px;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  
+  .status-item {
+    font-size: 10px;
+    padding: 5px 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .metrics-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .chat-panel {
+    height: 450px;
   }
 }
 
@@ -1606,7 +1717,7 @@ header {
 
 /* State History Panel */
 .state-history-panel {
-  border-top: 1px solid var(--border);
+  border: 1px solid var(--border);
   padding: 20px;
   background: var(--surface);
   min-height: 80px;
@@ -1615,6 +1726,12 @@ header {
   flex-shrink: 0;
   border-radius: 12px;
   width: 100%;
+  transition: all 0.3s ease;
+}
+
+.state-history-panel:hover {
+  border-color: rgba(0, 219, 180, 0.4);
+  box-shadow: 0 4px 16px rgba(0, 219, 180, 0.1);
 }
 
 .state-history-panel::-webkit-scrollbar {
@@ -1741,10 +1858,17 @@ header {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  border-bottom: 1px solid var(--border);
+  border: 1px solid var(--border);
   border-radius: 12px;
   width: 100%;
   padding: 0;
+  background: var(--surface);
+  transition: all 0.3s ease;
+}
+
+.activity-feed-area:hover {
+  border-color: rgba(0, 219, 180, 0.4);
+  box-shadow: 0 4px 16px rgba(0, 219, 180, 0.1);
 }
 
 .activity-scroll {
