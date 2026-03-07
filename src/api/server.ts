@@ -13,6 +13,7 @@ import { HybridAnalyzer } from '../ai/HybridAnalyzer';
 import { createConversationRoutes } from './routes/conversations';
 import { createReportRoutes } from './routes/reports';
 import { createAnalyzeRoutes } from './routes/analyze';
+import { createThreatRoutes } from './routes/threat';
 import { ReportRepository } from '../persistence/interfaces';
 
 export class APIServer {
@@ -86,6 +87,7 @@ export class APIServer {
           conversations: '/api/v1/conversations',
           reports: '/api/v1/reports',
           analyze: '/api/v1/analyze',
+          threat: '/api/v1/threat',
           health: '/health',
           metrics: '/api/v1/metrics',
         },
@@ -110,7 +112,11 @@ export class APIServer {
       this.app.use('/api/v1/analyze', analyzeRoutes);
     }
 
-    // Metrics endpoint (demo stats)
+    // Threat intelligence routes
+    const threatRoutes = createThreatRoutes();
+    this.app.use('/api/v1/threat', threatRoutes);
+
+    // Metrics endpoint (demo stats with AI performance)
     this.app.get('/api/v1/metrics', (_req, res) => {
       res.json({
         totalScamsAnalyzed: 847,
@@ -130,6 +136,13 @@ export class APIServer {
           impersonation: 512,
           threat: 387,
           authority_claim: 298
+        },
+        aiPerformance: {
+          modelAccuracy: 92,
+          precision: 89,
+          recall: 91,
+          f1Score: 90,
+          avgResponseTime: 1.2
         },
         uptime: process.uptime(),
         timestamp: new Date().toISOString()

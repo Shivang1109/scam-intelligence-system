@@ -13,6 +13,7 @@ let signalCount = 0;
 let totalScans = 0;
 let allEntities = new Set();
 let isApiAvailable = true; // Track API availability
+let activityCount = 0;
 
 // Scam Presets
 const PRESETS = {
@@ -45,12 +46,20 @@ function newConversation() {
   messageCount = 0;
   entityCount = 0;
   signalCount = 0;
+  activityCount = 0;
   allEntities.clear();
   
   document.getElementById('chatMessages').innerHTML = `
     <div class="empty-state">
       <div class="empty-icon">🎯</div>
       <div class="empty-text">NEW SESSION STARTED<br>TYPE A SCAM MESSAGE TO BEGIN</div>
+    </div>
+  `;
+  
+  document.getElementById('activityFeed').innerHTML = `
+    <div class="empty-state">
+      <div class="empty-icon">📊</div>
+      <div class="empty-text">MONITORING SYSTEM ACTIVITY</div>
     </div>
   `;
   
@@ -70,6 +79,7 @@ function newConversation() {
   resetAIDisplays();
   updateStatusBar();
   document.getElementById('sbConvId').textContent = 'SESSION: —';
+  document.getElementById('activityCount').textContent = '0';
 }
 
 // Send message
@@ -87,6 +97,7 @@ async function sendMessage() {
   
   addMessage('scammer', msg);
   addTypingIndicator();
+  addActivity('agent', '🤖 Agent engaged scammer');
   
   // Show API status indicator
   showApiStatus('connecting');
@@ -203,6 +214,9 @@ function updateFromConversation(conv) {
         chip.innerHTML = getEntityIcon(e.type) + ' ' + e.value;
         el.appendChild(chip);
         entityCount++;
+        
+        // Add to activity feed
+        addActivity('extraction', `📌 Entity extracted: ${e.type} - ${e.value.substring(0, 20)}${e.value.length > 20 ? '...' : ''}`);
       }
     });
   }
@@ -322,6 +336,9 @@ function simulateLocalAnalysis(msg) {
         chip.innerHTML = getEntityIcon(e.type) + ' ' + e.value;
         entEl.appendChild(chip);
         entityCount++;
+        
+        // Add to activity feed
+        addActivity('extraction', `📌 Entity extracted: ${e.type} - ${e.value.substring(0, 20)}${e.value.length > 20 ? '...' : ''}`);
       }
     });
   }
@@ -357,8 +374,13 @@ function simulateLocalAnalysis(msg) {
   addMessage('agent', replies[Math.floor(Math.random() * replies.length)]);
   updateState(risk > 50 ? 'EXTRACTION' : risk > 25 ? 'INFORMATION_GATHERING' : 'ENGAGEMENT');
   
-  if (risk > 70) showToast('⚠️ HIGH RISK SCAM DETECTED', 'danger');
-  else if (risk > 40) showToast('⚡ SCAM SIGNALS DETECTED', 'warn');
+  if (risk > 70) {
+    showToast('⚠️ HIGH RISK SCAM DETECTED', 'danger');
+    addActivity('risk', `⚠️ High risk scam detected (${risk}% risk score)`);
+  } else if (risk > 40) {
+    showToast('⚡ SCAM SIGNALS DETECTED', 'warn');
+    addActivity('risk', `⚡ Scam signals detected (${risk}% risk score)`);
+  }
   
   updateStatusBar();
 }
@@ -421,6 +443,38 @@ function addSignal(s) {
     <div class="signal-conf">${Math.round((s.confidence || 0) * 100)}%</div>
   `;
   c.insertBefore(d, c.firstChild);
+  
+  // Add to activity feed
+  addActivity('detection', `🚨 Signal detected: ${s.type.replace('_', ' ')}`);
+}
+
+// Add activity to feed
+function addActivity(type, text) {
+  const c = document.getElementById('activityFeed');
+  const empty = c.querySelector('.empty-state');
+  if (empty) empty.remove();
+  
+  const now = new Date();
+  const hours = String(now.getHours()).padStart(2, '0');
+  const minutes = String(now.getMinutes()).padStart(2, '0');
+  const timeStr = `${hours}:${minutes}`;
+  
+  const d = document.createElement('div');
+  d.className = 'activity-item ' + type;
+  d.innerHTML = `
+    <div class="activity-time">${timeStr}</div>
+    <div class="activity-text">${escHtml(text)}</div>
+  `;
+  c.insertBefore(d, c.firstChild);
+  
+  activityCount++;
+  document.getElementById('activityCount').textContent = activityCount;
+  
+  // Keep only last 20 activities
+  const items = c.querySelectorAll('.activity-item');
+  if (items.length > 20) {
+    items[items.length - 1].remove();
+  }
 }
 
 // Update risk display
