@@ -14,6 +14,8 @@ let totalScans = 0;
 let allEntities = new Set();
 let isApiAvailable = true; // Track API availability
 let activityCount = 0;
+let scamPatternCount = 0;
+let detectedSignalsInMessage = [];
 
 // Scam Presets
 const PRESETS = {
@@ -47,6 +49,8 @@ function newConversation() {
   entityCount = 0;
   signalCount = 0;
   activityCount = 0;
+  scamPatternCount = 0;
+  detectedSignalsInMessage = [];
   allEntities.clear();
   
   document.getElementById('chatMessages').innerHTML = `
@@ -70,16 +74,25 @@ function newConversation() {
     </div>
   `;
   
-  document.getElementById('entitiesList').innerHTML = `
-    <span style="font-family:'Syne Mono',monospace;font-size:11px;color:var(--muted)">No entities extracted yet</span>
+  document.getElementById('intelligenceGrid').innerHTML = `
+    <div class="empty-state">
+      <div class="empty-icon">🔍</div>
+      <div class="empty-text">NO INTELLIGENCE EXTRACTED</div>
+    </div>
+  `;
+  
+  document.getElementById('connectionsList').innerHTML = `
+    <span style="font-family:'Syne Mono',monospace;font-size:11px;color:var(--muted)">No connections mapped yet</span>
   `;
   
   updateRisk(0, 'LOW RISK', 'No threat detected', 'Awaiting data...');
   updateState('IDLE');
   resetAIDisplays();
   updateStatusBar();
+  updateGlobalMetrics();
   document.getElementById('sbConvId').textContent = 'SESSION: —';
   document.getElementById('activityCount').textContent = '0';
+  document.getElementById('intelligenceCount').textContent = '0';
 }
 
 // Send message
@@ -97,7 +110,7 @@ async function sendMessage() {
   
   addMessage('scammer', msg);
   addTypingIndicator();
-  addActivity('agent', '🤖 Agent engaged scammer');
+  addActivity('agent', '[AGENT]', 'Honeypot agent engaged scammer');
   
   // Show API status indicator
   showApiStatus('connecting');
@@ -206,17 +219,12 @@ function updateFromConversation(conv) {
       const k = e.type + ':' + e.value;
       if (!allEntities.has(k)) {
         allEntities.add(k);
-        const el = document.getElementById('entitiesList');
-        if (el.querySelector('span:not(.entity-chip)')) el.innerHTML = '';
-        
-        const chip = document.createElement('span');
-        chip.className = 'entity-chip entity-' + e.type;
-        chip.innerHTML = getEntityIcon(e.type) + ' ' + e.value;
-        el.appendChild(chip);
+        addIntelligenceCard(e.type, e.value);
+        addThreatConnection(e.type, e.value);
         entityCount++;
         
         // Add to activity feed
-        addActivity('extraction', `📌 Entity extracted: ${e.type} - ${e.value.substring(0, 20)}${e.value.length > 20 ? '...' : ''}`);
+        addActivity('intelligence', '[INTELLIGENCE]', `Entity extracted: ${e.type} - ${e.value.substring(0, 20)}${e.value.length > 20 ? '...' : ''}`);
       }
     });
   }
@@ -331,14 +339,12 @@ function simulateLocalAnalysis(msg) {
       const k = e.type + ':' + e.value;
       if (!allEntities.has(k)) {
         allEntities.add(k);
-        const chip = document.createElement('span');
-        chip.className = 'entity-chip entity-' + e.type;
-        chip.innerHTML = getEntityIcon(e.type) + ' ' + e.value;
-        entEl.appendChild(chip);
+        addIntelligenceCard(e.type, e.value);
+        addThreatConnection(e.type, e.value);
         entityCount++;
         
         // Add to activity feed
-        addActivity('extraction', `📌 Entity extracted: ${e.type} - ${e.value.substring(0, 20)}${e.value.length > 20 ? '...' : ''}`);
+        addActivity('intelligence', '[INTELLIGENCE]', `Entity extracted: ${e.type} - ${e.value.substring(0, 20)}${e.value.length > 20 ? '...' : ''}`);
       }
     });
   }
@@ -376,13 +382,14 @@ function simulateLocalAnalysis(msg) {
   
   if (risk > 70) {
     showToast('⚠️ HIGH RISK SCAM DETECTED', 'danger');
-    addActivity('risk', `⚠️ High risk scam detected (${risk}% risk score)`);
+    addActivity('analysis', '[ANALYSIS]', `High risk scam detected (${risk}% risk score)`);
   } else if (risk > 40) {
     showToast('⚡ SCAM SIGNALS DETECTED', 'warn');
-    addActivity('risk', `⚡ Scam signals detected (${risk}% risk score)`);
+    addActivity('analysis', '[ANALYSIS]', `Scam signals detected (${risk}% risk score)`);
   }
   
   updateStatusBar();
+  updateGlobalMetrics();
 }
 
 // Add message to chat
@@ -394,9 +401,21 @@ function addMessage(sender, content) {
   const d = document.createElement('div');
   d.className = 'msg msg-' + sender;
   const lbl = sender === 'scammer' ? 'SCAMMER INPUT' : sender === 'agent' ? 'AI HONEYPOT' : 'SYSTEM';
+  
+  let signalsHtml = '';
+  if (sender === 'scammer' && detectedSignalsInMessage.length > 0) {
+    signalsHtml = '<div class="msg-signals">' + 
+      detectedSignalsInMessage.map(sig => {
+        const sigClass = sig.type.toLowerCase().replace('_', '');
+        return `<span class="inline-signal sig-${sigClass}">⚠ ${sig.type.replace('_', ' ')}</span>`;
+      }).join('') +
+      '</div>';
+    detectedSignalsInMessage = []; // Clear for next message
+  }
+  
   d.innerHTML = `
     <div class="msg-label">${lbl}</div>
-    <div class="msg-bubble">${escHtml(content)}</div>
+    <div class="msg-bubble">${escHtml(content)}${signalsHtml}</div>
   `;
   c.appendChild(d);
   c.scrollTop = c.scrollHeight;
@@ -444,12 +463,19 @@ function addSignal(s) {
   `;
   c.insertBefore(d, c.firstChild);
   
-  // Add to activity feed
-  addActivity('detection', `🚨 Signal detected: ${s.type.replace('_', ' ')}`);
+  // Store for inline display in message
+  detectedSignalsInMessage.push(s);
+  
+  // Add to activity feed with category
+  addActivity('detection', '[DETECTION]', `${s.type.replace('_', ' ')} signal detected`);
+  
+  // Update scam pattern count
+  scamPatternCount++;
+  updateGlobalMetrics();
 }
 
 // Add activity to feed
-function addActivity(type, text) {
+function addActivity(type, category, text) {
   const c = document.getElementById('activityFeed');
   const empty = c.querySelector('.empty-state');
   if (empty) empty.remove();
@@ -463,6 +489,7 @@ function addActivity(type, text) {
   d.className = 'activity-item ' + type;
   d.innerHTML = `
     <div class="activity-time">${timeStr}</div>
+    <div class="activity-category">${category}</div>
     <div class="activity-text">${escHtml(text)}</div>
   `;
   c.insertBefore(d, c.firstChild);
@@ -479,7 +506,7 @@ function addActivity(type, text) {
 
 // Update risk display
 function updateRisk(score, label, type, conf) {
-  const circ = 2 * Math.PI * 40;
+  const circ = 2 * Math.PI * 45;
   const arc = document.getElementById('riskArc');
   arc.style.strokeDashoffset = circ - (score / 100) * circ;
   
@@ -497,8 +524,37 @@ function updateRisk(score, label, type, conf) {
   else if (score > 25) b.classList.add('medium');
   else b.classList.add('low');
   
+  // Update threat level details
+  let threatLevelText = 'Low';
+  if (score > 75) threatLevelText = 'Critical';
+  else if (score > 50) threatLevelText = 'High';
+  else if (score > 25) threatLevelText = 'Medium';
+  
+  document.getElementById('threatLevel').textContent = threatLevelText;
+  document.getElementById('confidenceScore').textContent = Math.round(score) + '%';
+  document.getElementById('signalsDetectedCount').textContent = signalCount;
   document.getElementById('scamType').textContent = type;
-  document.getElementById('scamConf').textContent = conf;
+  
+  // Update system status bar
+  const statusEl = document.getElementById('threatLevelStatus');
+  const statusTextEl = document.getElementById('threatLevelText');
+  statusEl.className = 'status-item';
+  if (score > 75) {
+    statusEl.classList.add('status-critical');
+    statusTextEl.textContent = 'CRITICAL';
+  } else if (score > 50) {
+    statusEl.classList.add('status-critical');
+    statusTextEl.textContent = 'HIGH';
+  } else if (score > 25) {
+    statusEl.classList.add('status-warning');
+    statusTextEl.textContent = 'MEDIUM';
+  } else {
+    statusEl.classList.add('status-healthy');
+    statusTextEl.textContent = 'LOW';
+  }
+  
+  // Update summary footer
+  document.getElementById('summaryThreat').textContent = threatLevelText.toUpperCase();
   
   // WOW MOMENT: Critical risk alert
   if (score >= 80) {
@@ -540,6 +596,89 @@ function updateState(s) {
 function updateStatusBar() {
   document.getElementById('sbMessages').textContent = 'MESSAGES: ' + messageCount;
   document.getElementById('sbEntities').textContent = 'ENTITIES: ' + entityCount;
+  updateSummaryFooter();
+}
+
+// Update summary footer
+function updateSummaryFooter() {
+  document.getElementById('summaryEntities').textContent = entityCount;
+  document.getElementById('summarySignals').textContent = signalCount;
+  
+  const duration = document.getElementById('conversationDuration').textContent;
+  document.getElementById('summaryDuration').textContent = duration.replace('⏱ ', '');
+  
+  const sessionId = conversationId ? conversationId.substring(0, 8).toUpperCase() : '—';
+  document.getElementById('summarySession').textContent = sessionId;
+}
+
+// Update global metrics
+function updateGlobalMetrics() {
+  document.getElementById('metricSessions').textContent = conversationId ? '1' : '0';
+  document.getElementById('metricSignals').textContent = signalCount;
+  document.getElementById('metricEntities').textContent = entityCount;
+  document.getElementById('metricPatterns').textContent = scamPatternCount;
+}
+
+// Add intelligence card
+function addIntelligenceCard(type, value) {
+  const grid = document.getElementById('intelligenceGrid');
+  const empty = grid.querySelector('.empty-state');
+  if (empty) empty.remove();
+  
+  const card = document.createElement('div');
+  card.className = 'intelligence-card intel-' + type;
+  
+  const icon = getEntityIcon(type);
+  const displayValue = value.length > 25 ? value.substring(0, 25) + '...' : value;
+  
+  card.innerHTML = `
+    <div class="intel-icon">${icon}</div>
+    <div class="intel-type">${type.replace('_', ' ')}</div>
+    <div class="intel-value">${escHtml(displayValue)}</div>
+  `;
+  
+  grid.appendChild(card);
+  
+  const count = grid.querySelectorAll('.intelligence-card').length;
+  document.getElementById('intelligenceCount').textContent = count;
+}
+
+// Add threat connection
+function addThreatConnection(type, value) {
+  const list = document.getElementById('connectionsList');
+  const empty = list.querySelector('span:not(.connection-item)');
+  if (empty) empty.remove();
+  
+  // Create simple relationship mapping
+  let source = 'Scammer';
+  let target = type.replace('_', ' ');
+  
+  if (type === 'phone_number') {
+    source = 'IRS Impersonation';
+    target = 'Phone Number';
+  } else if (type === 'url') {
+    source = 'Phishing Attempt';
+    target = 'Malicious Domain';
+  } else if (type === 'email') {
+    source = 'Social Engineering';
+    target = 'Email Address';
+  } else if (type === 'payment_id') {
+    source = 'Financial Request';
+    target = 'Payment ID';
+  } else if (type === 'organization') {
+    source = 'Authority Claim';
+    target = 'Organization';
+  }
+  
+  const item = document.createElement('div');
+  item.className = 'connection-item';
+  item.innerHTML = `
+    <span class="connection-source">${source}</span>
+    <span class="connection-arrow">→</span>
+    <span class="connection-target">${target}</span>
+  `;
+  
+  list.appendChild(item);
 }
 
 // Format scam type
