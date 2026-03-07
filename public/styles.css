@@ -180,7 +180,7 @@ header {
 
 .section-title {
   font-family: 'Syne Mono', monospace;
-  font-size: 11px;
+  font-size: 14px;
   letter-spacing: 2px;
   text-transform: uppercase;
   color: var(--accent);
@@ -339,7 +339,7 @@ header {
   border: 1px solid var(--border);
   border-radius: 12px;
   margin-bottom: 0;
-  min-height: 620px;
+  min-height: 520px;
   background: var(--surface);
   overflow: hidden;
 }
@@ -655,7 +655,7 @@ header {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 24px;
-  margin-top: 32px;
+  margin-top: 0;
   width: 100%;
 }
 
@@ -665,21 +665,24 @@ header {
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 20px;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  min-height: 200px;
 }
 
 .analysis-card:hover {
   border-color: rgba(0, 219, 180, 0.4);
   box-shadow: 0 4px 16px rgba(0, 219, 180, 0.1);
+  transform: translateY(-2px);
 }
 
 /* Threat Assessment - Full Width */
 .threat-assessment {
   grid-column: 1 / -1;
-  min-height: 220px;
+  min-height: 180px;
+  padding: 20px;
 }
 
 /* Activity Feed and Detected Signals */
@@ -727,20 +730,22 @@ header {
 /* Risk Panel (Threat Assessment) */
 .threat-assessment .risk-display { 
   display: grid;
-  grid-template-columns: 200px 1fr;
+  grid-template-columns: 140px 1fr;
+  align-items: center;
   gap: 24px;
-  align-items: flex-start;
 }
 
 .risk-circle-wrap { 
   position: relative; 
-  width: 120px; 
-  height: 120px; 
+  width: 100px; 
+  height: 100px; 
   flex-shrink: 0; 
 }
 
 .risk-svg { 
-  transform: rotate(-90deg); 
+  transform: rotate(-90deg);
+  width: 100px;
+  height: 100px;
 }
 
 .risk-track { 
@@ -752,7 +757,7 @@ header {
 .risk-gradient-ring {
   fill: none;
   stroke-width: 8;
-  stroke-dasharray: 283;
+  stroke-dasharray: 239;
   stroke-dashoffset: 0;
 }
 
@@ -760,8 +765,8 @@ header {
   fill: none; 
   stroke-width: 8; 
   stroke-linecap: round; 
-  stroke-dasharray: 283; 
-  stroke-dashoffset: 283; 
+  stroke-dasharray: 239; 
+  stroke-dashoffset: 239; 
   transition: stroke-dashoffset 0.8s ease, stroke 0.5s ease; 
   filter: drop-shadow(0 0 8px currentColor);
 }
@@ -778,7 +783,7 @@ header {
 .risk-score-val { 
   font-family: 'Syne', sans-serif; 
   font-weight: 800; 
-  font-size: 28px; 
+  font-size: 24px; 
   line-height: 1; 
   transition: color 0.5s; 
 }
@@ -1305,10 +1310,10 @@ header {
   width: 100%;
   background: rgba(4, 8, 15, 0.98);
   border-top: 2px solid var(--accent);
-  padding: 14px 28px;
+  padding: 20px 24px;
   backdrop-filter: blur(20px);
   box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.5);
-  margin-top: 32px;
+  margin-top: 40px;
   height: auto;
 }
 
@@ -1317,7 +1322,7 @@ header {
   font-size: 10px;
   letter-spacing: 2px;
   color: var(--accent);
-  margin-bottom: 12px;
+  margin-bottom: 16px;
   text-transform: uppercase;
   display: flex;
   align-items: center;
@@ -1332,7 +1337,7 @@ header {
 .summary-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr);
-  gap: 16px;
+  gap: 24px;
   align-items: center;
 }
 
@@ -1928,11 +1933,12 @@ header {
 /* Analysis Grid Section */
 .analysis-grid-header {
   font-family: 'Syne Mono', monospace;
-  font-size: 13px;
+  font-size: 14px;
   letter-spacing: 2px;
   text-transform: uppercase;
   color: var(--accent);
-  margin-bottom: 24px;
+  margin-bottom: 20px;
+  margin-top: 40px;
   padding-bottom: 12px;
   border-bottom: 2px solid rgba(0, 255, 200, 0.2);
   display: flex;

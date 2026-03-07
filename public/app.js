@@ -527,7 +527,7 @@ function addActivity(type, category, text) {
 
 // Update risk display
 function updateRisk(score, label, type, conf) {
-  const circ = 2 * Math.PI * 45;
+  const circ = 2 * Math.PI * 38;
   const arc = document.getElementById('riskArc');
   arc.style.strokeDashoffset = circ - (score / 100) * circ;
   
