@@ -28,11 +28,6 @@ body {
   scroll-behavior: smooth;
 }
 
-.dashboard-container {
-  min-height: 100vh;
-  padding: 0 0 140px 0;
-}
-
 body::before {
   content: '';
   position: fixed; 
@@ -56,13 +51,14 @@ header {
   display: flex; 
   align-items: center; 
   justify-content: space-between;
-  padding: 18px 40px; 
+  padding: 18px 32px; 
   border-bottom: 1px solid var(--border);
   background: rgba(4,8,15,0.95); 
   backdrop-filter: blur(20px);
   position: sticky; 
   top: 0; 
   z-index: 100;
+  max-width: 100%;
 }
 
 .logo { 
@@ -109,11 +105,12 @@ header {
 .system-status-bar {
   background: rgba(4, 8, 15, 0.95);
   border-bottom: 1px solid var(--border);
-  padding: 12px 40px;
+  padding: 12px 32px;
   display: flex;
   align-items: center;
   gap: 32px;
   backdrop-filter: blur(20px);
+  max-width: 100%;
 }
 
 .status-item {
@@ -169,8 +166,9 @@ header {
 .global-metrics {
   background: var(--surface);
   border-bottom: 1px solid var(--border);
-  padding: 24px 32px 32px 32px;
+  padding: 24px 0 32px 0;
   margin-bottom: 0;
+  max-width: 100%;
 }
 
 .section-title {
@@ -292,9 +290,22 @@ header {
   display: flex;
   flex-direction: column;
   gap: 32px;
-  padding: 24px 32px;
-  max-width: 1600px;
+  padding: 0;
+  max-width: 1500px;
   margin: 0 auto;
+}
+
+.dashboard-container {
+  min-height: 100vh;
+  padding: 0 32px 140px 32px;
+}
+
+.dashboard-section {
+  margin-bottom: 32px;
+}
+
+.dashboard-section:last-child {
+  margin-bottom: 0;
 }
 
 .panel { 
@@ -326,7 +337,7 @@ header {
   border: 1px solid var(--border);
   border-radius: 12px;
   margin-bottom: 0;
-  height: 650px;
+  min-height: 620px;
   background: var(--surface);
   overflow: hidden;
 }
@@ -341,6 +352,7 @@ header {
   scroll-behavior: smooth;
   scrollbar-width: thin;
   scrollbar-color: var(--accent) var(--surface);
+  max-height: 520px;
 }
 
 .chat-messages::-webkit-scrollbar {
@@ -354,6 +366,14 @@ header {
 .chat-messages::-webkit-scrollbar-thumb {
   background: var(--accent);
   border-radius: 3px;
+}
+
+.chat-input-area {
+  position: sticky;
+  bottom: 0;
+  background: var(--surface2);
+  border-top: 1px solid var(--border);
+  padding: 20px 24px;
 }
 
 .chat-messages::-webkit-scrollbar { 
@@ -635,17 +655,10 @@ header {
   width: 100%;
 }
 
-.dashboard-section {
-  margin-bottom: 0;
-}
-
-.dashboard-section:last-child {
-  margin-bottom: 0;
-}
-
 /* Full width sections */
 .dashboard-section.full-width {
   grid-column: 1 / -1;
+  width: 100%;
 }
 
 /* Consistent card styling */
@@ -677,9 +690,10 @@ header {
 }
 
 .risk-display { 
-  display: flex; 
-  align-items: flex-start; 
-  gap: 24px; 
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 24px;
+  align-items: flex-start;
 }
 
 .risk-circle-wrap { 
@@ -860,7 +874,7 @@ header {
   display: flex; 
   align-items: center; 
   gap: 12px; 
-  padding: 10px 14px; 
+  padding: 12px 16px; 
   border-radius: 8px; 
   margin-bottom: 8px; 
   border: 1px solid transparent; 
@@ -1616,9 +1630,8 @@ header {
 
 /* Responsive Design */
 @media (max-width: 1200px) {
-  .layout {
-    padding: 20px 24px;
-    gap: 28px;
+  .dashboard-container {
+    padding: 0 24px 140px 24px;
   }
   
   .right-col {
@@ -1626,18 +1639,29 @@ header {
   }
   
   .chat-panel {
-    height: 550px;
+    min-height: 550px;
+  }
+  
+  .chat-messages {
+    max-height: 450px;
   }
 }
 
 @media (max-width: 768px) {
+  .dashboard-container {
+    padding: 0 16px 140px 16px;
+  }
+  
   .layout {
-    padding: 16px;
     gap: 24px;
   }
   
+  .dashboard-section {
+    margin-bottom: 24px;
+  }
+  
   .global-metrics {
-    padding: 20px 16px 24px 16px;
+    padding: 20px 0 24px 0;
   }
   
   .metrics-grid {
@@ -1646,7 +1670,16 @@ header {
   }
   
   .chat-panel {
-    height: 500px;
+    min-height: 500px;
+  }
+  
+  .chat-messages {
+    max-height: 400px;
+  }
+  
+  .risk-display {
+    grid-template-columns: 1fr;
+    gap: 16px;
   }
   
   .summary-grid {
@@ -1664,6 +1697,10 @@ header {
     font-size: 10px;
     padding: 5px 10px;
   }
+  
+  header {
+    padding: 16px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -1676,7 +1713,11 @@ header {
   }
   
   .chat-panel {
-    height: 450px;
+    min-height: 450px;
+  }
+  
+  .chat-messages {
+    max-height: 350px;
   }
 }
 
