@@ -130,10 +130,10 @@ LIVE
 <!-- ANALYSIS PANELS GRID -->
 <div id="analysis-section">
 <div class="analysis-grid-header">THREAT ANALYSIS</div>
-<div class="right-col">
+<div class="analysis-grid">
 
-<!-- Risk Meter -->
-<div class="risk-panel dashboard-section">
+<!-- Threat Assessment (Full Width) -->
+<div class="analysis-card threat-assessment">
 <div class="section-title">THREAT ASSESSMENT</div>
 <div class="risk-display">
 <div class="risk-circle-wrap">
@@ -174,7 +174,7 @@ LIVE
 </div>
 
 <!-- Activity Feed -->
-<div class="activity-feed-area dashboard-section full-width">
+<div class="analysis-card activity-feed">
 <div class="panel-header" style="padding:14px 20px;flex-shrink:0;">
 <span class="panel-title">// ACTIVITY FEED</span>
 <span id="activityCount" style="font-family:'Syne Mono',monospace;font-size:11px;color:var(--muted)">0</span>
@@ -187,8 +187,8 @@ LIVE
 </div>
 </div>
 
-<!-- Signals -->
-<div class="signals-area dashboard-section full-width">
+<!-- Detected Signals -->
+<div class="analysis-card detected-signals">
 <div class="panel-header" style="padding:14px 20px;flex-shrink:0;">
 <span class="panel-title">// DETECTED SIGNALS</span>
 <span id="signalCount" style="font-family:'Syne Mono',monospace;font-size:11px;color:var(--muted)">0</span>
@@ -202,7 +202,7 @@ LIVE
 </div>
 
 <!-- Detected Intelligence -->
-<div class="intelligence-panel dashboard-section full-width">
+<div class="analysis-card detected-intelligence">
 <div class="panel-header" style="padding:14px 20px;flex-shrink:0;">
 <span class="panel-title">// DETECTED INTELLIGENCE</span>
 <span id="intelligenceCount" style="font-family:'Syne Mono',monospace;font-size:11px;color:var(--muted)">0</span>
@@ -216,42 +216,13 @@ LIVE
 </div>
 
 <!-- Threat Connections -->
-<div class="connections-panel dashboard-section full-width">
+<div class="analysis-card threat-connections">
 <div class="section-title">THREAT CONNECTIONS</div>
 <div id="connectionsList">
 <span style="font-family:'Syne Mono',monospace;font-size:11px;color:var(--muted)">No connections mapped yet</span>
 </div>
 </div>
 
-<!-- AI Analysis -->
-<div class="ai-panel dashboard-section">
-<div class="section-title">
-AI ANALYSIS
-<span class="ai-badge" id="aiBadge" style="display:none;margin-left:auto">
-<i class="fas fa-robot"></i> GPT-4
-</span>
-</div>
-<div id="aiReasoning" style="font-family:'DM Sans',sans-serif;font-size:12px;color:var(--muted);line-height:1.6">
-Awaiting analysis...
-</div>
-</div>
-
-<!-- Persona -->
-<div class="persona-panel dashboard-section">
-<div class="section-title">ACTIVE PERSONA</div>
-<div id="personaInfo">
-<span style="font-family:'Syne Mono',monospace;font-size:11px;color:var(--muted)">No persona assigned yet</span>
-</div>
-</div>
-
-<!-- State History -->
-<div class="state-history-panel dashboard-section">
-<div class="section-title">STATE TIMELINE</div>
-<div id="stateHistory" class="state-timeline">
-<span style="font-family:'Syne Mono',monospace;font-size:11px;color:var(--muted)">No state transitions yet</span>
-</div>
-</div>
-</div>
 </div>
 </div>
 

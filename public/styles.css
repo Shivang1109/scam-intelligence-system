@@ -650,59 +650,82 @@ header {
   color: var(--accent); 
 }
 
-.right-col { 
+/* Analysis Grid */
+.analysis-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 24px;
-  width: 100%;
   margin-top: 32px;
-  min-height: 400px;
-}
-
-/* Ultra-wide screen optimization */
-@media (min-width: 1600px) {
-  .right-col {
-    grid-template-columns: repeat(3, 1fr);
-  }
-}
-
-/* Full width sections */
-.dashboard-section.full-width {
-  grid-column: 1 / -1;
   width: 100%;
 }
 
-/* Consistent card styling */
-.right-col .panel-header,
-.right-col .section-title {
-  padding: 16px 20px;
-}
-
-.right-col > div {
-  width: 100%;
-  padding: 20px;
-  border-radius: 12px;
-}
-
-/* Risk Panel */
-/* Risk Panel */
-.risk-panel { 
-  padding: 20px; 
+/* Analysis Cards */
+.analysis-card {
+  background: var(--surface);
   border: 1px solid var(--border);
-  background: var(--surface2); 
-  flex-shrink: 0;
-  min-height: auto;
   border-radius: 12px;
-  width: 100%;
+  padding: 20px;
   transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 
-.risk-panel:hover {
+.analysis-card:hover {
   border-color: rgba(0, 219, 180, 0.4);
   box-shadow: 0 4px 16px rgba(0, 219, 180, 0.1);
 }
 
-.risk-display { 
+/* Threat Assessment - Full Width */
+.threat-assessment {
+  grid-column: 1 / -1;
+  min-height: 220px;
+}
+
+/* Activity Feed and Detected Signals */
+.activity-feed,
+.detected-signals {
+  min-height: 320px;
+  max-height: 400px;
+  padding: 0;
+}
+
+/* Detected Intelligence and Threat Connections */
+.detected-intelligence {
+  min-height: 240px;
+  max-height: 360px;
+  padding: 0;
+}
+
+.threat-connections {
+  min-height: 180px;
+  max-height: 240px;
+}
+
+/* Ultra-wide screen optimization */
+@media (min-width: 1600px) {
+  .analysis-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .threat-assessment {
+    grid-column: 1 / -1;
+  }
+}
+
+/* Responsive - Single Column */
+@media (max-width: 900px) {
+  .analysis-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .threat-assessment {
+    grid-column: 1;
+  }
+}
+
+/* Risk Panel (Threat Assessment) */
+.threat-assessment .risk-display { 
   display: grid;
   grid-template-columns: 200px 1fr;
   gap: 24px;
@@ -847,40 +870,70 @@ header {
   color: var(--accent);
 }
 
-/* Signals Area */
-.signals-area { 
-  min-height: 280px; 
-  max-height: 360px; 
-  flex-shrink: 0;
-  display: flex; 
-  flex-direction: column; 
-  overflow: hidden;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  width: 100%;
-  padding: 0;
-  background: var(--surface);
-  transition: all 0.3s ease;
+/* Activity Feed */
+.activity-feed .activity-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  min-height: 260px;
 }
 
-.signals-area:hover {
-  border-color: rgba(0, 219, 180, 0.4);
-  box-shadow: 0 4px 16px rgba(0, 219, 180, 0.1);
+.activity-feed .activity-scroll::-webkit-scrollbar {
+  width: 3px;
 }
 
-.signals-scroll { 
-  flex: 1; 
-  overflow-y: auto; 
-  padding: 16px; 
+.activity-feed .activity-scroll::-webkit-scrollbar-thumb {
+  background: var(--border);
+}
+
+/* Detected Signals */
+.detected-signals {
+  display: flex;
+  flex-direction: column;
+}
+
+.detected-signals .signals-scroll {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
   min-height: 220px;
 }
 
-.signals-scroll::-webkit-scrollbar { 
-  width: 3px; 
+.detected-signals .signals-scroll::-webkit-scrollbar {
+  width: 3px;
 }
 
-.signals-scroll::-webkit-scrollbar-thumb { 
-  background: var(--border); 
+.detected-signals .signals-scroll::-webkit-scrollbar-thumb {
+  background: var(--border);
+}
+
+/* Detected Intelligence */
+.detected-intelligence {
+  display: flex;
+  flex-direction: column;
+}
+
+.detected-intelligence .intelligence-grid {
+  padding: 16px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 14px;
+  overflow-y: auto;
+  flex: 1;
+  max-height: 280px;
+}
+
+.detected-intelligence .intelligence-grid::-webkit-scrollbar {
+  width: 3px;
+}
+
+/* Threat Connections */
+.threat-connections {
+  overflow-y: auto;
+}
+
+.threat-connections::-webkit-scrollbar {
+  width: 3px;
 }
 
 .signal-item { 
@@ -992,41 +1045,7 @@ header {
   flex-shrink: 0; 
 }
 
-/* Detected Intelligence Panel */
-.intelligence-panel {
-  border: 1px solid var(--border);
-  min-height: 240px;
-  max-height: none;
-  flex-shrink: 0;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  border-radius: 12px;
-  width: 100%;
-  padding: 0;
-  background: var(--surface);
-  transition: all 0.3s ease;
-}
-
-.intelligence-panel:hover {
-  border-color: rgba(0, 219, 180, 0.4);
-  box-shadow: 0 4px 16px rgba(0, 219, 180, 0.1);
-}
-
-.intelligence-grid {
-  padding: 16px;
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 14px;
-  overflow-y: auto;
-  flex: 1;
-  max-height: 320px;
-}
-
-.intelligence-grid::-webkit-scrollbar {
-  width: 3px;
-}
-
+/* Intelligence Card Styles */
 .intelligence-card {
   background: rgba(0, 0, 0, 0.3);
   border: 1px solid var(--border);
@@ -1097,29 +1116,7 @@ header {
   line-height: 1.4;
 }
 
-/* Threat Connections Panel */
-.connections-panel {
-  border: 1px solid var(--border);
-  padding: 20px;
-  background: var(--surface2);
-  min-height: 120px;
-  max-height: 180px;
-  overflow-y: auto;
-  flex-shrink: 0;
-  border-radius: 12px;
-  width: 100%;
-  transition: all 0.3s ease;
-}
-
-.connections-panel:hover {
-  border-color: rgba(0, 219, 180, 0.4);
-  box-shadow: 0 4px 16px rgba(0, 219, 180, 0.1);
-}
-
-.connections-panel::-webkit-scrollbar {
-  width: 3px;
-}
-
+/* Connection Item Styles */
 .connection-item {
   display: flex;
   align-items: center;
@@ -1646,9 +1643,13 @@ header {
     padding: 0 24px 40px 24px;
   }
   
-  .right-col {
+  .analysis-grid {
     grid-template-columns: 1fr;
     margin-top: 24px;
+  }
+  
+  .threat-assessment {
+    grid-column: 1;
   }
   
   .chat-panel {
@@ -1661,8 +1662,12 @@ header {
 }
 
 @media (max-width: 900px) {
-  .right-col {
+  .analysis-grid {
     grid-template-columns: 1fr;
+  }
+  
+  .threat-assessment {
+    grid-column: 1;
   }
 }
 
