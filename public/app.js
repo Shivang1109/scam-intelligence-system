@@ -92,12 +92,12 @@ function newConversation() {
   document.getElementById('intelligenceGrid').innerHTML = `
     <div class="empty-state">
       <div class="empty-icon">🔍</div>
-      <div class="empty-text">NO INTELLIGENCE EXTRACTED</div>
+      <div class="empty-text">WAITING FOR ENTITY EXTRACTION<br>Send a scam message to analyze intelligence</div>
     </div>
   `;
   
   document.getElementById('connectionsList').innerHTML = `
-    <span style="font-family:'Syne Mono',monospace;font-size:11px;color:var(--muted)">No connections mapped yet</span>
+    <span style="font-family:'Syne Mono',monospace;font-size:11px;color:var(--muted)">Threat network will appear once entities are detected</span>
   `;
   
   updateRisk(0, 'LOW RISK', 'No threat detected', 'Awaiting data...');
@@ -321,7 +321,7 @@ function simulateLocalAnalysis(msg) {
     sigs.push({ type: 'TOO_GOOD_TO_BE_TRUE', confidence: 0.88, text: 'Unrealistic promises detected' });
   }
   
-  // Extract entities
+  // Extract entities with enhanced patterns
   const pm = msg.match(/[\+]?[(]?[0-9]{3}[)]?[-\s\.]?[0-9]{3}[-\s\.]?[0-9]{4,6}/);
   if (pm) ents.push({ type: 'phone_number', value: pm[0] });
   
@@ -336,6 +336,22 @@ function simulateLocalAnalysis(msg) {
   
   const am = msg.match(/[0-9]{8,}/);
   if (am && !pm) ents.push({ type: 'bank_account', value: am[0] });
+  
+  // Extract organization names (common scam impersonations)
+  const orgPatterns = [
+    /\b(IRS|FBI|CIA|NSA|DHS|Social Security|Medicare|Medicaid)\b/i,
+    /\b(Amazon|Microsoft|Apple|Google|Facebook|PayPal|Netflix)\b/i,
+    /\b(Bank of America|Wells Fargo|Chase|Citibank)\b/i,
+    /\b(FedEx|UPS|USPS|DHL)\b/i
+  ];
+  
+  for (const pattern of orgPatterns) {
+    const om = msg.match(pattern);
+    if (om) {
+      ents.push({ type: 'organization', value: om[0] });
+      break; // Only add first match
+    }
+  }
   
   risk = Math.min(risk, 100);
   
@@ -670,33 +686,39 @@ function addThreatConnection(type, value) {
   const empty = list.querySelector('span:not(.connection-item)');
   if (empty) empty.remove();
   
-  // Create simple relationship mapping
-  let source = 'Scammer';
-  let target = type.replace('_', ' ');
+  // Create intelligent relationship mapping based on entity type
+  let source = '';
+  let target = '';
   
   if (type === 'phone_number') {
-    source = 'IRS Impersonation';
-    target = 'Phone Number';
+    source = value;
+    target = 'Scam Call Center';
   } else if (type === 'url') {
-    source = 'Phishing Attempt';
-    target = 'Malicious Domain';
+    source = value.replace('...', '');
+    target = 'Phishing Infrastructure';
   } else if (type === 'email') {
-    source = 'Social Engineering';
-    target = 'Email Address';
+    source = value;
+    target = 'Scammer Email';
   } else if (type === 'payment_id') {
-    source = 'Financial Request';
-    target = 'Payment ID';
+    source = value;
+    target = 'Crypto Wallet';
   } else if (type === 'organization') {
-    source = 'Authority Claim';
-    target = 'Organization';
+    source = value;
+    target = 'Impersonation Target';
+  } else if (type === 'bank_account') {
+    source = value;
+    target = 'Bank Account';
+  } else {
+    source = value;
+    target = type.replace('_', ' ').toUpperCase();
   }
   
   const item = document.createElement('div');
   item.className = 'connection-item';
   item.innerHTML = `
-    <span class="connection-source">${source}</span>
+    <span class="connection-source">${escHtml(source.substring(0, 30))}</span>
     <span class="connection-arrow">→</span>
-    <span class="connection-target">${target}</span>
+    <span class="connection-target">${escHtml(target)}</span>
   `;
   
   list.appendChild(item);
