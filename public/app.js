@@ -39,7 +39,22 @@ function usePreset(type) {
   input.value = PRESETS[type];
   input.focus();
   // Auto-send after a brief moment for visual feedback
-  setTimeout(() => sendMessage(), 300);
+  setTimeout(() => {
+    sendMessage();
+    // Scroll to analysis section after message is sent
+    setTimeout(() => scrollToAnalysis(), 500);
+  }, 300);
+}
+
+// Scroll to analysis section
+function scrollToAnalysis() {
+  const analysisSection = document.getElementById('analysis-section');
+  if (analysisSection) {
+    analysisSection.scrollIntoView({ 
+      behavior: 'smooth', 
+      block: 'start' 
+    });
+  }
 }
 
 // Start new conversation
@@ -171,6 +186,9 @@ async function sendMessage() {
   
   document.getElementById('sendBtn').disabled = false;
   updateStatusBar();
+  
+  // Scroll to analysis section after message processing
+  setTimeout(() => scrollToAnalysis(), 600);
 }
 
 // Refresh conversation data
@@ -390,6 +408,9 @@ function simulateLocalAnalysis(msg) {
   
   updateStatusBar();
   updateGlobalMetrics();
+  
+  // Scroll to analysis section after local analysis
+  setTimeout(() => scrollToAnalysis(), 600);
 }
 
 // Add message to chat

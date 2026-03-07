@@ -653,6 +653,14 @@ header {
   grid-template-columns: repeat(2, 1fr);
   gap: 24px;
   width: 100%;
+  margin-top: 32px;
+}
+
+/* Ultra-wide screen optimization */
+@media (min-width: 1600px) {
+  .right-col {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
 /* Full width sections */
@@ -669,6 +677,8 @@ header {
 
 .right-col > div {
   width: 100%;
+  padding: 20px;
+  border-radius: 12px;
 }
 
 /* Risk Panel */
@@ -1636,6 +1646,7 @@ header {
   
   .right-col {
     grid-template-columns: 1fr;
+    margin-top: 24px;
   }
   
   .chat-panel {
@@ -1644,6 +1655,12 @@ header {
   
   .chat-messages {
     max-height: 450px;
+  }
+}
+
+@media (max-width: 900px) {
+  .right-col {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -1707,6 +1724,19 @@ header {
   .metrics-grid {
     grid-template-columns: 1fr;
   }
+  
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .chat-panel {
+    min-height: 450px;
+  }
+  
+  .chat-messages {
+    max-height: 350px;
+  }
+}
   
   .summary-grid {
     grid-template-columns: 1fr;
@@ -1883,7 +1913,31 @@ header {
   }
 }
 
-/* System message style */
+/* Analysis Grid Section */
+.analysis-grid-header {
+  font-family: 'Syne Mono', monospace;
+  font-size: 13px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 24px;
+  padding-bottom: 12px;
+  border-bottom: 2px solid rgba(0, 255, 200, 0.2);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.analysis-grid-header::before {
+  content: '//';
+  color: rgba(0, 219, 180, 0.5);
+  font-size: 16px;
+}
+
+/* Scroll padding for smooth navigation */
+#analysis-section {
+  scroll-margin-top: 20px;
+}
 .msg.system {
   background: rgba(245, 166, 35, 0.1);
   border-left: 3px solid var(--warn);
