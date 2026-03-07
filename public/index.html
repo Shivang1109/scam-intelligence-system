@@ -9,6 +9,7 @@
 </head>
 <body>
 <div class="grid-bg"></div>
+<div class="dashboard-container">
 
 <header>
 <div class="logo">
@@ -48,6 +49,8 @@ LIVE
 
 <!-- Global Intelligence Metrics -->
 <div class="global-metrics">
+<div class="section-title">GLOBAL INTELLIGENCE METRICS</div>
+<div class="metrics-grid">
 <div class="metric-card">
 <div class="metric-icon">🕵</div>
 <div class="metric-info">
@@ -77,10 +80,11 @@ LIVE
 </div>
 </div>
 </div>
+</div>
 
 <div class="layout">
 <!-- LEFT: CHAT -->
-<div class="chat-panel panel">
+<div class="chat-panel panel dashboard-section">
 <div class="panel-header">
 <span class="panel-title">// SCAMMER SIMULATION CONSOLE</span>
 <div style="display:flex;align-items:center;gap:10px">
@@ -126,8 +130,8 @@ LIVE
 <!-- RIGHT COL -->
 <div class="right-col panel">
 <!-- Risk Meter -->
-<div class="risk-panel">
-<div style="font-family:'Syne Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--muted);margin-bottom:14px">THREAT ASSESSMENT</div>
+<div class="risk-panel dashboard-section">
+<div class="section-title">THREAT ASSESSMENT</div>
 <div class="risk-display">
 <div class="risk-circle-wrap">
 <svg class="risk-svg" width="120" height="120" viewBox="0 0 120 120">
@@ -167,7 +171,7 @@ LIVE
 </div>
 
 <!-- Activity Feed -->
-<div class="activity-feed-area">
+<div class="activity-feed-area dashboard-section">
 <div class="panel-header" style="padding:14px 20px;flex-shrink:0;">
 <span class="panel-title">// ACTIVITY FEED</span>
 <span id="activityCount" style="font-family:'Syne Mono',monospace;font-size:11px;color:var(--muted)">0</span>
@@ -181,7 +185,7 @@ LIVE
 </div>
 
 <!-- Signals -->
-<div class="signals-area">
+<div class="signals-area dashboard-section">
 <div class="panel-header" style="padding:14px 20px;flex-shrink:0;">
 <span class="panel-title">// DETECTED SIGNALS</span>
 <span id="signalCount" style="font-family:'Syne Mono',monospace;font-size:11px;color:var(--muted)">0</span>
@@ -195,7 +199,7 @@ LIVE
 </div>
 
 <!-- Detected Intelligence -->
-<div class="intelligence-panel">
+<div class="intelligence-panel dashboard-section">
 <div class="panel-header" style="padding:14px 20px;flex-shrink:0;">
 <span class="panel-title">// DETECTED INTELLIGENCE</span>
 <span id="intelligenceCount" style="font-family:'Syne Mono',monospace;font-size:11px;color:var(--muted)">0</span>
@@ -209,18 +213,18 @@ LIVE
 </div>
 
 <!-- Threat Connections -->
-<div class="connections-panel">
-<div style="font-family:'Syne Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--muted);margin-bottom:10px">THREAT CONNECTIONS</div>
+<div class="connections-panel dashboard-section">
+<div class="section-title">THREAT CONNECTIONS</div>
 <div id="connectionsList">
 <span style="font-family:'Syne Mono',monospace;font-size:11px;color:var(--muted)">No connections mapped yet</span>
 </div>
 </div>
 
 <!-- AI Analysis -->
-<div class="ai-panel">
-<div style="font-family:'Syne Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;justify-content:space-between">
-<span>AI ANALYSIS</span>
-<span class="ai-badge" id="aiBadge" style="display:none">
+<div class="ai-panel dashboard-section">
+<div class="section-title">
+AI ANALYSIS
+<span class="ai-badge" id="aiBadge" style="display:none;margin-left:auto">
 <i class="fas fa-robot"></i> GPT-4
 </span>
 </div>
@@ -230,16 +234,16 @@ Awaiting analysis...
 </div>
 
 <!-- Persona -->
-<div class="persona-panel">
-<div style="font-family:'Syne Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--muted);margin-bottom:10px">ACTIVE PERSONA</div>
+<div class="persona-panel dashboard-section">
+<div class="section-title">ACTIVE PERSONA</div>
 <div id="personaInfo">
 <span style="font-family:'Syne Mono',monospace;font-size:11px;color:var(--muted)">No persona assigned yet</span>
 </div>
 </div>
 
 <!-- State History -->
-<div class="state-history-panel">
-<div style="font-family:'Syne Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--muted);margin-bottom:10px">STATE TIMELINE</div>
+<div class="state-history-panel dashboard-section">
+<div class="section-title">STATE TIMELINE</div>
 <div id="stateHistory" class="state-timeline">
 <span style="font-family:'Syne Mono',monospace;font-size:11px;color:var(--muted)">No state transitions yet</span>
 </div>
@@ -270,6 +274,10 @@ Awaiting analysis...
 <div class="summary-item">
 <span class="summary-label">SESSION ID:</span>
 <span class="summary-value" id="summarySession">—</span>
+</div>
+</div>
+</div>
+
 </div>
 </div>
 </div>
